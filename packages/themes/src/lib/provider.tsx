@@ -94,6 +94,23 @@ export const ThemeProvider = component$<ThemeProviderProps>(
       { strategy: 'document-idle' },
     );
 
+    // Hydrate themeSig from localStorage on client mount. The inline ThemeScript
+    // applies classes to <html> before paint, but the signal resumes as '' —
+    // without this, the first toggle click after a refresh computes from an
+    // empty base and overwrites the persisted multi-class theme.
+    // eslint-disable-next-line qwik/no-use-visible-task -- needs to seed the signal before any user interaction
+    useVisibleTask$(
+      () => {
+        const stored = localStorage.getItem(storageKey);
+        if (stored) {
+          themeSig.value = stored.includes(' ') ? stored.split(' ') : stored;
+        } else if (defaultTheme) {
+          themeSig.value = defaultTheme;
+        }
+      },
+      { strategy: 'document-ready' },
+    );
+
     // localStorage event handling
 
     useOnWindow(
