@@ -8,7 +8,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "nx build website",
+    "build": "nx build website -c production",
     "build.cloudflare": "nx build-cloudflare website",
     "build.headless": "nx build headless",
     "build.qwik-ci": "nx run-many --target=build -p packages/*",
