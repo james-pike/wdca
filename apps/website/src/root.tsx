@@ -31,7 +31,7 @@ export default component$(() => {
   const appState = useStore<AppState>({
     featureFlags: {
       showStyled: true,
-      showNeumorphic: import.meta.env.DEV,
+      showNeumorphic: true,
     },
   });
 
