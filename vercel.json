@@ -1,5 +1,3 @@
 {
-  "buildCommand": "pnpm build",
-  "outputDirectory": "dist/apps/website/client",
-  "framework": null
+  "buildCommand": "pnpm build && rm -rf .vercel/output && mkdir -p .vercel/output/static && cp -r dist/apps/website/client/. .vercel/output/static/ && echo '{\"version\":3}' > .vercel/output/config.json"
 }
