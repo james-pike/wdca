@@ -7,5 +7,6 @@ export * from './theme/theme-config.type';
 export * from './theme/theme-fonts';
 export * from './theme/theme-modes';
 export * from './theme/theme-primary-colors';
+export * from './theme/theme-secondary-colors';
 export * from './theme/theme-styles';
 export * from './inline-component';

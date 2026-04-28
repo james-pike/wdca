@@ -3,6 +3,7 @@ import { ThemeBorderRadius } from './theme-border-radiuses';
 import { type ThemeFont } from './theme-fonts';
 import { type ThemeMode } from './theme-modes';
 import { type ThemePrimaryColor } from './theme-primary-colors';
+import { type ThemeSecondaryColor } from './theme-secondary-colors';
 import { type ThemeStyle } from './theme-styles';
 
 export type ThemeConfig = {
@@ -11,5 +12,6 @@ export type ThemeConfig = {
   style?: ThemeStyle | string;
   borderRadius?: ThemeBorderRadius | string;
   primaryColor?: ThemePrimaryColor | string;
+  secondaryColor?: ThemeSecondaryColor | string;
   baseColor?: ThemeBaseColor | string;
 };

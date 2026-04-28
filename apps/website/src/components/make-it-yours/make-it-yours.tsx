@@ -6,6 +6,7 @@ import {
   ThemeFonts,
   ThemeModes,
   ThemePrimaryColors,
+  ThemeSecondaryColors,
   ThemeStyles,
   cn,
 } from '@qwik-ui/utils';
@@ -30,6 +31,7 @@ export default component$<PropsOf<typeof Button>>(() => {
         style: ThemeStyles.SIMPLE,
         baseColor: ThemeBaseColors.SLATE,
         primaryColor: ThemePrimaryColors.CYAN600,
+        secondaryColor: ThemeSecondaryColors.FUCHSIA500,
         borderRadius: ThemeBorderRadiuses['BORDER-RADIUS-0'],
       };
     }
@@ -41,6 +43,7 @@ export default component$<PropsOf<typeof Button>>(() => {
         style: ThemeStyles.SIMPLE,
         baseColor: ThemeBaseColors.SLATE,
         primaryColor: ThemePrimaryColors.CYAN600,
+        secondaryColor: ThemeSecondaryColors.FUCHSIA500,
         borderRadius: ThemeBorderRadiuses['BORDER-RADIUS-0'],
       };
     }
@@ -55,13 +58,24 @@ export default component$<PropsOf<typeof Button>>(() => {
       baseColor: themeArray[3],
       primaryColor: themeArray[4],
       borderRadius: themeArray[5],
+      // Backward compat: themes saved before secondary picker existed have 6
+      // entries; default to fuchsia so the hero gradient stays warm.
+      secondaryColor: themeArray[6] ?? ThemeSecondaryColors.FUCHSIA500,
     };
   });
 
   const themeStoreToThemeClasses$ = $((): string => {
-    const { font, mode, style, baseColor, primaryColor, borderRadius } =
+    const { font, mode, style, baseColor, primaryColor, secondaryColor, borderRadius } =
       themeComputedObjectSig.value;
-    return [font, mode, style, baseColor, primaryColor, borderRadius].join(' ');
+    return [
+      font,
+      mode,
+      style,
+      baseColor,
+      primaryColor,
+      borderRadius,
+      secondaryColor,
+    ].join(' ');
   });
   return (
     <Modal.Root>
@@ -421,6 +435,40 @@ export default component$<PropsOf<typeof Button>>(() => {
                         )}
                       />
                     )}
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
+
+          <label class="mt-8 mb-1 block font-medium">Secondary</label>
+          <div class="flex justify-end">
+            <div class="grid grid-cols-[repeat(22,0fr)]">
+              {Object.values(ThemeSecondaryColors).map((secondaryColor: string) => {
+                const isActive =
+                  themeComputedObjectSig.value.secondaryColor === secondaryColor;
+                const shade = secondaryColor.replace('secondary-', '');
+                if (shade.endsWith('-100') || shade.endsWith('-200')) {
+                  return <span key={secondaryColor}></span>;
+                }
+                return (
+                  <Button
+                    key={secondaryColor}
+                    look="ghost"
+                    size="icon"
+                    onClick$={async () => {
+                      themeComputedObjectSig.value.secondaryColor = secondaryColor;
+                      themeSig.value = await themeStoreToThemeClasses$();
+                    }}
+                    class={cn(
+                      'h-3 w-3 rounded-none',
+                      isActive && 'border border-ring',
+                    )}
+                  >
+                    <span
+                      class="flex h-[10px] w-[10px] shrink-0 rounded-none"
+                      style={{ backgroundColor: `var(--color-${shade})` }}
+                    />
                   </Button>
                 );
               })}

@@ -15,6 +15,7 @@ import {
   ThemeFonts,
   ThemeModes,
   ThemePrimaryColors,
+  ThemeSecondaryColors,
   ThemeStyles,
 } from '@qwik-ui/utils';
 
@@ -56,6 +57,7 @@ export default component$(() => {
             ...Object.values(ThemeStyles),
             ...Object.values(ThemeBaseColors),
             ...Object.values(ThemePrimaryColors),
+            ...Object.values(ThemeSecondaryColors),
             ...Object.values(ThemeBorderRadiuses),
           ]}
         >
