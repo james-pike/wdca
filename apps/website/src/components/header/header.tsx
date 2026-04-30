@@ -23,13 +23,13 @@ import { LuMenu, LuMoon, LuSun, LuX } from '@qwikest/icons/lucide';
 import { DocsNavigation } from '../navigation-docs/navigation-docs';
 import { useKitMenuItems } from '~/routes/layout';
 import { cn } from '@qwik-ui/utils';
-import { Button, buttonVariants } from '@qwik-ui/styled';
+import { Button } from '@qwik-ui/styled';
 import MakeItYours from '../make-it-yours/make-it-yours';
 import { ColorPickers } from '../color-pickers/color-pickers';
 import { FontPicker } from '../font-picker/font-picker';
 import { StylePicker } from '../header-pickers/style-picker';
 import { RadiusPicker } from '../header-pickers/radius-picker';
-import { SearchModal } from '../search/search';
+// import { SearchModal } from '../search/search';
 export interface HeaderProps {
   showVersion?: boolean;
   showBottomBorder?: boolean;

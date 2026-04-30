@@ -89,9 +89,16 @@ export default component$(() => {
   );
 });
 
+declare global {
+  interface Window {
+    symbols: string[];
+  }
+}
+
 export function collectSymbols() {
-  (window as any).symbols = [];
-  document.addEventListener('qsymbol', (e) =>
-    (window as any).symbols.push((e as any).detail.symbol),
-  );
+  window.symbols = [];
+  document.addEventListener('qsymbol', (e) => {
+    const detail = (e as CustomEvent<{ symbol: string }>).detail;
+    window.symbols.push(detail.symbol);
+  });
 }
