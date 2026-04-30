@@ -9,7 +9,7 @@ const RADII: Array<{ value: string; label: string; rxPx: number }> = [
   { value: ThemeBorderRadiuses['BORDER-RADIUS-DOT-25'], label: '.25', rxPx: 2 },
   { value: ThemeBorderRadiuses['BORDER-RADIUS-DOT-50'], label: '.5', rxPx: 4 },
   { value: ThemeBorderRadiuses['BORDER-RADIUS-DOT-75'], label: '.75', rxPx: 6 },
-  { value: ThemeBorderRadiuses['BORDER-RADIUS-1'], label: '1', rxPx: 9 },
+  { value: ThemeBorderRadiuses['BORDER-RADIUS-1'], label: '1', rxPx: 8 },
 ];
 
 export const RadiusPicker = component$(() => {
@@ -32,28 +32,27 @@ export const RadiusPicker = component$(() => {
           'inline-flex h-10 w-10 items-center justify-center rounded-md border border-input bg-background shadow-sm transition-colors hover:bg-accent focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none',
         )}
       >
+        {/* Static rounded-square icon — always visually reads as a radius affordance */}
         <svg
-          width="20"
-          height="20"
+          width="18"
+          height="18"
           viewBox="0 0 20 20"
           aria-hidden="true"
           class="text-foreground"
         >
-          <rect
-            x="2"
-            y="2"
-            width="16"
-            height="16"
-            rx={current.rxPx}
+          <path
+            d="M4 17 L4 8 A4 4 0 0 1 8 4 L17 4"
             fill="none"
             stroke="currentColor"
-            stroke-width="2"
+            stroke-width="2.2"
+            stroke-linecap="round"
           />
         </svg>
       </Popover.Trigger>
-      <Popover.Panel class="!w-auto">
-        <div class="mb-2 text-sm font-medium">Radius</div>
-        <div class="flex items-center gap-2">
+
+      <Popover.Panel class="w-auto min-w-[20rem]">
+        <div class="mb-3 text-sm font-medium">Radius</div>
+        <div class="flex flex-wrap gap-2">
           {RADII.map((r) => {
             const isActive = themeConfigSig.value.borderRadius === r.value;
             return (
@@ -63,22 +62,23 @@ export const RadiusPicker = component$(() => {
                 onClick$={() => setRadius(r.value)}
                 aria-label={`Border radius ${r.label}`}
                 class={cn(
-                  'flex h-10 w-10 items-center justify-center border border-input bg-background text-xs font-medium transition-colors hover:bg-accent',
-                  isActive && 'border-ring ring-1 ring-ring',
+                  'inline-flex h-14 w-14 flex-col items-center justify-center gap-1 rounded-md border-2 border-input bg-background text-xs font-medium text-foreground transition-colors hover:bg-accent',
+                  isActive && 'border-primary text-primary',
                 )}
               >
-                <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
                   <rect
-                    x="2"
-                    y="2"
-                    width="16"
-                    height="16"
+                    x="3"
+                    y="3"
+                    width="18"
+                    height="18"
                     rx={r.rxPx}
                     fill="none"
                     stroke="currentColor"
                     stroke-width="2"
                   />
                 </svg>
+                <span class="leading-none">{r.label}</span>
               </button>
             );
           })}
