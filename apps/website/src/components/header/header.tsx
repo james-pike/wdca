@@ -169,7 +169,7 @@ export default component$(({ showVersion = false }: HeaderProps) => {
             <StylePicker />
             <RadiusPicker />
             <MakeItYours />
-            <SearchModal />
+            {/* <SearchModal /> */}
             <DarkModeToggle />
             <Button
               type="button"

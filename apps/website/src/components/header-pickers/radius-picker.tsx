@@ -1,7 +1,7 @@
 import { $, component$, useComputed$ } from '@builder.io/qwik';
 import { useTheme } from '@qwik-ui/themes';
 import { ThemeBorderRadiuses, cn } from '@qwik-ui/utils';
-import { Popover } from '@qwik-ui/styled';
+import { Button, Popover } from '@qwik-ui/styled';
 import { parseThemeString, serializeThemeConfig } from './theme-helpers';
 
 const RADII: Array<{ value: string; label: string; rxPx: number }> = [
@@ -32,7 +32,6 @@ export const RadiusPicker = component$(() => {
           'inline-flex h-10 w-10 items-center justify-center rounded-md border border-input bg-background shadow-sm transition-colors hover:bg-accent focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none',
         )}
       >
-        {/* Static rounded-square icon — always visually reads as a radius affordance */}
         <svg
           width="18"
           height="18"
@@ -50,23 +49,26 @@ export const RadiusPicker = component$(() => {
         </svg>
       </Popover.Trigger>
 
-      <Popover.Panel class="w-auto min-w-[20rem]">
-        <div class="mb-3 text-sm font-medium">Radius</div>
-        <div class="flex flex-wrap gap-2">
+      <Popover.Panel>
+        <div class="mb-2 text-sm font-medium">Radius</div>
+        <div class="flex items-center gap-2">
           {RADII.map((r) => {
             const isActive = themeConfigSig.value.borderRadius === r.value;
             return (
-              <button
+              <Button
                 key={r.value}
-                type="button"
+                look={isActive ? 'primary' : 'outline'}
+                size="sm"
                 onClick$={() => setRadius(r.value)}
                 aria-label={`Border radius ${r.label}`}
-                class={cn(
-                  'inline-flex h-14 w-14 flex-col items-center justify-center gap-1 rounded-md border-2 border-input bg-background text-xs font-medium text-foreground transition-colors hover:bg-accent',
-                  isActive && 'border-primary text-primary',
-                )}
+                class="h-12 w-12 flex-col gap-0.5 px-0 py-0"
               >
-                <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
                   <rect
                     x="3"
                     y="3"
@@ -78,8 +80,8 @@ export const RadiusPicker = component$(() => {
                     stroke-width="2"
                   />
                 </svg>
-                <span class="leading-none">{r.label}</span>
-              </button>
+                <span class="text-[10px] leading-none">{r.label}</span>
+              </Button>
             );
           })}
         </div>
