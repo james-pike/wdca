@@ -27,6 +27,8 @@ import { cn } from '@qwik-ui/utils';
 import { DiscordIcon } from '../icons/discord';
 import { Button, buttonVariants } from '@qwik-ui/styled';
 import MakeItYours from '../make-it-yours/make-it-yours';
+import { ColorPickers } from '../color-pickers/color-pickers';
+import { FontPicker } from '../font-picker/font-picker';
 import { SearchModal } from '../search/search';
 export interface HeaderProps {
   showVersion?: boolean;
@@ -162,6 +164,8 @@ export default component$(({ showVersion = false }: HeaderProps) => {
             )}
           </div>
           <div class="xs:space-x-4 flex items-center space-x-1">
+            <ColorPickers />
+            <FontPicker />
             <MakeItYours />
             <SearchModal />
             <a
