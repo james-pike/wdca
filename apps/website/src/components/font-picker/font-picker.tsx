@@ -1,116 +1,82 @@
-import {
-  $,
-  component$,
-  useSignal,
-  useVisibleTask$,
-} from '@builder.io/qwik';
+import { $, component$, useComputed$ } from '@builder.io/qwik';
 import { Popover } from '@qwik-ui/styled';
-import { cn } from '@qwik-ui/utils';
+import { ThemeFontFamilies, cn } from '@qwik-ui/utils';
+import { useTheme } from '@qwik-ui/themes';
+import {
+  parseThemeString,
+  serializeThemeConfig,
+} from '../header-pickers/theme-helpers';
 
 type FontEntry = {
   name: string;
+  value: string;
   family: string;
-  weights?: string;
 };
 
 const FONTS: FontEntry[] = [
-  { name: 'System Default', family: '' },
-  { name: 'Inter', family: 'Inter', weights: '300;400;500;600;700' },
-  { name: 'Roboto', family: 'Roboto', weights: '400;500;700' },
-  { name: 'Open Sans', family: 'Open Sans', weights: '400;500;600;700' },
-  { name: 'Poppins', family: 'Poppins', weights: '400;500;600;700' },
-  { name: 'Montserrat', family: 'Montserrat', weights: '400;500;600;700' },
-  { name: 'DM Sans', family: 'DM Sans', weights: '400;500;700' },
-  { name: 'Space Grotesk', family: 'Space Grotesk', weights: '400;500;700' },
-  { name: 'Nunito', family: 'Nunito', weights: '400;500;600;700' },
-  { name: 'Work Sans', family: 'Work Sans', weights: '400;500;600;700' },
-  { name: 'Lora', family: 'Lora', weights: '400;500;600;700' },
-  { name: 'Playfair Display', family: 'Playfair Display', weights: '400;500;700' },
-  { name: 'Merriweather', family: 'Merriweather', weights: '400;700' },
-  { name: 'JetBrains Mono', family: 'JetBrains Mono', weights: '400;500;700' },
-  { name: 'Fira Code', family: 'Fira Code', weights: '400;500;700' },
+  { name: 'System Default', value: ThemeFontFamilies.SYSTEM, family: '' },
+  { name: 'Inter', value: ThemeFontFamilies.INTER, family: 'Inter' },
+  { name: 'Roboto', value: ThemeFontFamilies.ROBOTO, family: 'Roboto' },
+  { name: 'Open Sans', value: ThemeFontFamilies.OPEN_SANS, family: 'Open Sans' },
+  { name: 'Poppins', value: ThemeFontFamilies.POPPINS, family: 'Poppins' },
+  {
+    name: 'Montserrat',
+    value: ThemeFontFamilies.MONTSERRAT,
+    family: 'Montserrat',
+  },
+  { name: 'DM Sans', value: ThemeFontFamilies.DM_SANS, family: 'DM Sans' },
+  {
+    name: 'Space Grotesk',
+    value: ThemeFontFamilies.SPACE_GROTESK,
+    family: 'Space Grotesk',
+  },
+  { name: 'Nunito', value: ThemeFontFamilies.NUNITO, family: 'Nunito' },
+  { name: 'Work Sans', value: ThemeFontFamilies.WORK_SANS, family: 'Work Sans' },
+  { name: 'Lora', value: ThemeFontFamilies.LORA, family: 'Lora' },
+  {
+    name: 'Playfair Display',
+    value: ThemeFontFamilies.PLAYFAIR_DISPLAY,
+    family: 'Playfair Display',
+  },
+  {
+    name: 'Merriweather',
+    value: ThemeFontFamilies.MERRIWEATHER,
+    family: 'Merriweather',
+  },
+  {
+    name: 'JetBrains Mono',
+    value: ThemeFontFamilies.JETBRAINS_MONO,
+    family: 'JetBrains Mono',
+  },
+  { name: 'Fira Code', value: ThemeFontFamilies.FIRA_CODE, family: 'Fira Code' },
 ];
-
-const STORAGE_KEY = 'qui-font';
-const COMBINED_LINK_ID = 'qui-google-fonts';
 
 const fontStack = (family: string) =>
   family ? `'${family}', system-ui, sans-serif` : '';
 
-const buildCombinedUrl = () => {
-  const parts = FONTS.filter((f) => f.family).map(
-    (f) => `family=${encodeURIComponent(f.family).replace(/%20/g, '+')}:wght@${f.weights ?? '400;700'}`,
-  );
-  return `https://fonts.googleapis.com/css2?${parts.join('&')}&display=swap`;
-};
-
-const applyFontToDocument = (family: string) => {
-  if (family) {
-    document.documentElement.style.setProperty('--font-sans', fontStack(family));
-    document.documentElement.style.fontFamily = fontStack(family);
-  } else {
-    document.documentElement.style.removeProperty('--font-sans');
-    document.documentElement.style.fontFamily = '';
-  }
-};
-
 export const FontPicker = component$(() => {
-  const currentSig = useSignal('System Default');
+  const { themeSig } = useTheme();
+  const themeConfigSig = useComputed$(() => parseThemeString(themeSig.value));
 
-  // eslint-disable-next-line qwik/no-use-visible-task -- needs to inject font link + read localStorage on client
-  useVisibleTask$(() => {
-    if (!document.getElementById(COMBINED_LINK_ID)) {
-      const preconnect1 = document.createElement('link');
-      preconnect1.rel = 'preconnect';
-      preconnect1.href = 'https://fonts.googleapis.com';
-      document.head.appendChild(preconnect1);
-
-      const preconnect2 = document.createElement('link');
-      preconnect2.rel = 'preconnect';
-      preconnect2.href = 'https://fonts.gstatic.com';
-      preconnect2.crossOrigin = 'anonymous';
-      document.head.appendChild(preconnect2);
-
-      const link = document.createElement('link');
-      link.id = COMBINED_LINK_ID;
-      link.rel = 'stylesheet';
-      link.href = buildCombinedUrl();
-      document.head.appendChild(link);
-    }
-
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const match = FONTS.find((f) => f.name === saved);
-      if (match) {
-        currentSig.value = match.name;
-        applyFontToDocument(match.family);
-      }
-    }
+  const setFont = $((value: string) => {
+    themeConfigSig.value.fontFamily = value;
+    themeSig.value = serializeThemeConfig(themeConfigSig.value);
   });
 
-  const pick = $((font: FontEntry) => {
-    applyFontToDocument(font.family);
-    localStorage.setItem(STORAGE_KEY, font.name);
-    currentSig.value = font.name;
-  });
-
-  const currentFont = FONTS.find((f) => f.name === currentSig.value) ?? FONTS[0];
+  const current =
+    FONTS.find((f) => f.value === themeConfigSig.value.fontFamily) ?? FONTS[0];
 
   return (
     <Popover.Root flip floating="bottom-end" gutter={8}>
       <Popover.Trigger
-        aria-label={`Choose font (current: ${currentFont.name})`}
+        aria-label={`Choose font (current: ${current.name})`}
         class={cn(
           'inline-flex h-10 w-10 items-center justify-center rounded-md border border-input bg-background shadow-sm transition-colors hover:bg-accent focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none',
         )}
       >
         <span
           class="text-base leading-none font-bold"
-          style={
-            currentFont.family
-              ? { fontFamily: fontStack(currentFont.family) }
-              : undefined
-          }
+          style={current.family ? { fontFamily: fontStack(current.family) } : undefined}
         >
           Aa
         </span>
@@ -119,12 +85,12 @@ export const FontPicker = component$(() => {
         <div class="mb-2 text-sm font-medium">Font</div>
         <div class="flex max-h-80 flex-col gap-1 overflow-auto pr-1">
           {FONTS.map((font) => {
-            const isActive = currentSig.value === font.name;
+            const isActive = current.value === font.value;
             return (
               <button
-                key={font.name}
+                key={font.value}
                 type="button"
-                onClick$={() => pick(font)}
+                onClick$={() => setFont(font.value)}
                 class={cn(
                   'flex w-full items-center justify-between rounded-md px-3 py-2 text-left transition-colors hover:bg-accent',
                   isActive && 'bg-accent ring-1 ring-ring',

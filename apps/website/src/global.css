@@ -2264,3 +2264,65 @@
     animation: 500ms cubic-bezier(0.87, 0, 0.13, 1) 0s 1 normal forwards accordion-close;
   }
 }
+
+/* Google font overrides — applied as classes on <html> by ThemeProvider.
+   Unlayered so they win over Tailwind's font-* utilities regardless of @layer order. */
+.qfont-system {
+  /* intentional no-op — falls back to font-sans / font-mono */
+}
+.qfont-inter {
+  font-family: 'Inter', system-ui, sans-serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+.qfont-roboto {
+  font-family: 'Roboto', system-ui, sans-serif;
+  --font-sans: 'Roboto', system-ui, sans-serif;
+}
+.qfont-open-sans {
+  font-family: 'Open Sans', system-ui, sans-serif;
+  --font-sans: 'Open Sans', system-ui, sans-serif;
+}
+.qfont-poppins {
+  font-family: 'Poppins', system-ui, sans-serif;
+  --font-sans: 'Poppins', system-ui, sans-serif;
+}
+.qfont-montserrat {
+  font-family: 'Montserrat', system-ui, sans-serif;
+  --font-sans: 'Montserrat', system-ui, sans-serif;
+}
+.qfont-dm-sans {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+}
+.qfont-space-grotesk {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  --font-sans: 'Space Grotesk', system-ui, sans-serif;
+}
+.qfont-nunito {
+  font-family: 'Nunito', system-ui, sans-serif;
+  --font-sans: 'Nunito', system-ui, sans-serif;
+}
+.qfont-work-sans {
+  font-family: 'Work Sans', system-ui, sans-serif;
+  --font-sans: 'Work Sans', system-ui, sans-serif;
+}
+.qfont-lora {
+  font-family: 'Lora', Georgia, serif;
+  --font-sans: 'Lora', Georgia, serif;
+}
+.qfont-playfair-display {
+  font-family: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Playfair Display', Georgia, serif;
+}
+.qfont-merriweather {
+  font-family: 'Merriweather', Georgia, serif;
+  --font-sans: 'Merriweather', Georgia, serif;
+}
+.qfont-jetbrains-mono {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  --font-sans: 'JetBrains Mono', ui-monospace, monospace;
+}
+.qfont-fira-code {
+  font-family: 'Fira Code', ui-monospace, monospace;
+  --font-sans: 'Fira Code', ui-monospace, monospace;
+}

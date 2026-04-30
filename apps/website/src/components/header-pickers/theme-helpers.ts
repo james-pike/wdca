@@ -2,6 +2,7 @@ import {
   ThemeBaseColors,
   ThemeBorderRadiuses,
   ThemeConfig,
+  ThemeFontFamilies,
   ThemeFonts,
   ThemeModes,
   ThemePrimaryColors,
@@ -17,6 +18,7 @@ const DEFAULT_LIGHT: ThemeConfig = {
   primaryColor: ThemePrimaryColors.CYAN600,
   secondaryColor: ThemeSecondaryColors.FUCHSIA500,
   borderRadius: ThemeBorderRadiuses['BORDER-RADIUS-0'],
+  fontFamily: ThemeFontFamilies.SYSTEM,
 };
 
 const DEFAULT_DARK: ThemeConfig = {
@@ -38,6 +40,7 @@ export function parseThemeString(
     primaryColor: arr[4],
     borderRadius: arr[5],
     secondaryColor: arr[6] ?? ThemeSecondaryColors.FUCHSIA500,
+    fontFamily: arr[7] ?? ThemeFontFamilies.SYSTEM,
   };
 }
 
@@ -50,5 +53,6 @@ export function serializeThemeConfig(c: ThemeConfig): string {
     c.primaryColor,
     c.borderRadius,
     c.secondaryColor,
+    c.fontFamily,
   ].join(' ');
 }

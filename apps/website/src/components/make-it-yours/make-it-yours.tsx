@@ -1,79 +1,26 @@
 import { $, PropsOf, component$, useComputed$ } from '@builder.io/qwik';
-import {
-  ThemeBaseColors,
-  ThemeBorderRadiuses,
-  ThemeConfig,
-  ThemeFonts,
-  ThemeModes,
-  ThemePrimaryColors,
-  ThemeSecondaryColors,
-  ThemeStyles,
-  cn,
-} from '@qwik-ui/utils';
+import { ThemeBaseColors, cn } from '@qwik-ui/utils';
 import { LuSlidersHorizontal, LuX } from '@qwikest/icons/lucide';
 import { useTheme } from '@qwik-ui/themes';
 
 import { Button, Modal, buttonVariants } from '~/components/ui';
 
 import CopyCssConfig from '../copy-css-config/copy-css-config';
+import {
+  parseThemeString,
+  serializeThemeConfig,
+} from '../header-pickers/theme-helpers';
 
 export default component$<PropsOf<typeof Button>>(() => {
   const { themeSig } = useTheme();
 
-  const themeComputedObjectSig = useComputed$((): ThemeConfig => {
-    if (!themeSig.value || themeSig.value === 'light') {
-      return {
-        font: ThemeFonts.SANS,
-        mode: ThemeModes.LIGHT,
-        style: ThemeStyles.SIMPLE,
-        baseColor: ThemeBaseColors.SLATE,
-        primaryColor: ThemePrimaryColors.CYAN600,
-        secondaryColor: ThemeSecondaryColors.FUCHSIA500,
-        borderRadius: ThemeBorderRadiuses['BORDER-RADIUS-0'],
-      };
-    }
+  const themeComputedObjectSig = useComputed$(() =>
+    parseThemeString(themeSig.value),
+  );
 
-    if (themeSig.value === 'dark') {
-      return {
-        font: ThemeFonts.SANS,
-        mode: ThemeModes.DARK,
-        style: ThemeStyles.SIMPLE,
-        baseColor: ThemeBaseColors.SLATE,
-        primaryColor: ThemePrimaryColors.CYAN600,
-        secondaryColor: ThemeSecondaryColors.FUCHSIA500,
-        borderRadius: ThemeBorderRadiuses['BORDER-RADIUS-0'],
-      };
-    }
-
-    const themeArray = Array.isArray(themeSig.value)
-      ? themeSig.value
-      : themeSig.value.split(' ');
-    return {
-      font: themeArray[0],
-      mode: themeArray[1],
-      style: themeArray[2],
-      baseColor: themeArray[3],
-      primaryColor: themeArray[4],
-      borderRadius: themeArray[5],
-      // Backward compat: themes saved before secondary picker existed have 6
-      // entries; default to fuchsia so the hero gradient stays warm.
-      secondaryColor: themeArray[6] ?? ThemeSecondaryColors.FUCHSIA500,
-    };
-  });
-
-  const themeStoreToThemeClasses$ = $((): string => {
-    const { font, mode, style, baseColor, primaryColor, secondaryColor, borderRadius } =
-      themeComputedObjectSig.value;
-    return [
-      font,
-      mode,
-      style,
-      baseColor,
-      primaryColor,
-      borderRadius,
-      secondaryColor,
-    ].join(' ');
-  });
+  const themeStoreToThemeClasses$ = $((): string =>
+    serializeThemeConfig(themeComputedObjectSig.value),
+  );
   return (
     <Modal.Root>
       <Modal.Trigger
