@@ -15,12 +15,9 @@ import { useTheme } from '@qwik-ui/themes';
 
 import { Button, Modal, buttonVariants } from '~/components/ui';
 
-import { useAppState } from '~/_state/use-app-state';
 import CopyCssConfig from '../copy-css-config/copy-css-config';
 
 export default component$<PropsOf<typeof Button>>(() => {
-  const rootStore = useAppState();
-
   const { themeSig } = useTheme();
 
   const themeComputedObjectSig = useComputed$((): ThemeConfig => {
@@ -93,30 +90,6 @@ export default component$<PropsOf<typeof Button>>(() => {
           <h2 class="justify-self-start text-lg font-bold">Edit Profile</h2>
         </header>
         <div class="mt-8 mb-2 py-4">
-          <label class="mb-1 block font-medium">Preset</label>
-          <select
-            class="rounded-base h-12 w-full border bg-background p-2"
-            value={themeComputedObjectSig.value.style}
-            onChange$={async (e, el) => {
-              if (el.value === 'simple') {
-                themeComputedObjectSig.value.font = ThemeFonts.SANS;
-              }
-              if (el.value === 'brutalist') {
-                themeComputedObjectSig.value.font = ThemeFonts.MONO;
-              }
-              if (el.value === 'neumorphic') {
-                themeComputedObjectSig.value.font = ThemeFonts.SANS;
-              }
-              themeComputedObjectSig.value.style = el.value;
-              themeSig.value = await themeStoreToThemeClasses$();
-            }}
-          >
-            <option value={'simple'}>Simple</option>
-            <option value={'brutalist'}>Brutalist</option>
-            {rootStore.featureFlags?.showNeumorphic && (
-              <option value={'neumorphic'}>Neumorphic</option>
-            )}
-          </select>
 
           <label class="mt-8 mb-1 block font-medium">Base</label>
           <div class="flex">
@@ -153,32 +126,6 @@ export default component$<PropsOf<typeof Button>>(() => {
             })}
           </div>
 
-          <div>
-            <label class="mt-8 mb-1 block font-medium">Radius</label>
-            <div class="flex h-12 space-x-3">
-              {Object.values(ThemeBorderRadiuses).map((borderRadius: string) => {
-                const isActive =
-                  themeComputedObjectSig.value.borderRadius === borderRadius;
-                return (
-                  <Button
-                    key={borderRadius}
-                    look="outline"
-                    onClick$={async () => {
-                      themeComputedObjectSig.value.borderRadius = borderRadius;
-                      themeSig.value = await themeStoreToThemeClasses$();
-                    }}
-                    class={cn('w-12', isActive && 'mb-2 border-ring')}
-                  >
-                    {borderRadius === 'border-radius-0' && 0}
-                    {borderRadius === 'border-radius-dot-25' && '.25'}
-                    {borderRadius === 'border-radius-dot-50' && '.5'}
-                    {borderRadius === 'border-radius-dot-75' && '.75'}
-                    {borderRadius === 'border-radius-1' && 1}
-                  </Button>
-                );
-              })}
-            </div>
-          </div>
           <div class="mt-8">
             Dark Mode{' '}
             <input

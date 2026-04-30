@@ -13,7 +13,6 @@ import { useLocation } from '@builder.io/qwik-city';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { version as styledKitVersion } from '../../../../../packages/kit-styled/package.json';
-import { GitHubIcon } from '../icons/GitHubIcon';
 import { LogoIcon, LogoWithBorders } from '../icons/logo';
 
 import { useTheme } from '@qwik-ui/themes';
@@ -24,11 +23,12 @@ import { LuMenu, LuMoon, LuSun, LuX } from '@qwikest/icons/lucide';
 import { DocsNavigation } from '../navigation-docs/navigation-docs';
 import { useKitMenuItems } from '~/routes/layout';
 import { cn } from '@qwik-ui/utils';
-import { DiscordIcon } from '../icons/discord';
 import { Button, buttonVariants } from '@qwik-ui/styled';
 import MakeItYours from '../make-it-yours/make-it-yours';
 import { ColorPickers } from '../color-pickers/color-pickers';
 import { FontPicker } from '../font-picker/font-picker';
+import { StylePicker } from '../header-pickers/style-picker';
+import { RadiusPicker } from '../header-pickers/radius-picker';
 import { SearchModal } from '../search/search';
 export interface HeaderProps {
   showVersion?: boolean;
@@ -166,23 +166,10 @@ export default component$(({ showVersion = false }: HeaderProps) => {
           <div class="xs:space-x-4 flex items-center space-x-1">
             <ColorPickers />
             <FontPicker />
+            <StylePicker />
+            <RadiusPicker />
             <MakeItYours />
             <SearchModal />
-            <a
-              href="https://discord.gg/PVWUUejrez"
-              target="_blank"
-              class={cn(buttonVariants({ size: 'icon', look: 'ghost' }))}
-            >
-              <DiscordIcon />
-            </a>
-            <a
-              target="_blank"
-              href="https://github.com/qwikifiers/qwik-ui"
-              aria-label="Qwik-UI GitHub repository"
-              class={cn(buttonVariants({ size: 'icon', look: 'ghost' }))}
-            >
-              <GitHubIcon />
-            </a>
             <DarkModeToggle />
             <Button
               type="button"
