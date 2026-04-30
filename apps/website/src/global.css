@@ -2326,3 +2326,10 @@
   font-family: 'Fira Code', ui-monospace, monospace;
   --font-sans: 'Fira Code', ui-monospace, monospace;
 }
+
+/* Per-base "swatch" preview color used by the header color picker trigger. */
+.base-slate { --base-swatch: var(--color-slate-500); }
+.base-gray { --base-swatch: var(--color-gray-500); }
+.base-neutral { --base-swatch: var(--color-neutral-500); }
+.base-zinc { --base-swatch: var(--color-zinc-500); }
+.base-stone { --base-swatch: var(--color-stone-500); }

@@ -1,5 +1,5 @@
 import { $, PropsOf, component$, useComputed$ } from '@builder.io/qwik';
-import { ThemeBaseColors, cn } from '@qwik-ui/utils';
+import { cn } from '@qwik-ui/utils';
 import { LuSlidersHorizontal, LuX } from '@qwikest/icons/lucide';
 import { useTheme } from '@qwik-ui/themes';
 
@@ -37,43 +37,7 @@ export default component$<PropsOf<typeof Button>>(() => {
           <h2 class="justify-self-start text-lg font-bold">Edit Profile</h2>
         </header>
         <div class="mt-8 mb-2 py-4">
-
-          <label class="mt-8 mb-1 block font-medium">Base</label>
-          <div class="flex">
-            {Object.values(ThemeBaseColors).map((baseColor: string) => {
-              const isActive = themeComputedObjectSig.value.baseColor === baseColor;
-
-              return (
-                <Button
-                  key={baseColor}
-                  look="ghost"
-                  size="icon"
-                  onClick$={async () => {
-                    themeComputedObjectSig.value.baseColor = baseColor;
-
-                    themeSig.value = await themeStoreToThemeClasses$();
-                  }}
-                  class={cn(
-                    'flex h-3 w-3 items-center justify-center rounded-none',
-                    isActive && 'border-2 border-ring',
-                  )}
-                >
-                  <span
-                    class={cn(
-                      'flex h-[10px] w-[10px] shrink-0 rounded-none',
-                      baseColor === 'base-slate' && 'bg-slate-500',
-                      baseColor === 'base-gray' && 'bg-gray-500',
-                      baseColor === 'base-neutral' && 'bg-neutral-500',
-                      baseColor === 'base-zinc' && 'bg-zinc-500',
-                      baseColor === 'base-stone' && 'bg-stone-500',
-                    )}
-                  />
-                </Button>
-              );
-            })}
-          </div>
-
-          <div class="mt-8">
+          <div>
             Dark Mode{' '}
             <input
               type="checkbox"

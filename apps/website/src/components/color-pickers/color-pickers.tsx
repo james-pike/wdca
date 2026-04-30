@@ -1,5 +1,6 @@
 import { $, type QRL, component$, useComputed$ } from '@builder.io/qwik';
 import {
+  ThemeBaseColors,
   ThemePrimaryColors,
   ThemeSecondaryColors,
   cn,
@@ -10,6 +11,14 @@ import {
   parseThemeString,
   serializeThemeConfig,
 } from '../header-pickers/theme-helpers';
+
+const BASE_SWATCH_CLASS: Record<string, string> = {
+  'base-slate': 'bg-slate-500',
+  'base-gray': 'bg-gray-500',
+  'base-neutral': 'bg-neutral-500',
+  'base-zinc': 'bg-zinc-500',
+  'base-stone': 'bg-stone-500',
+};
 
 export const ColorPickers = component$(() => {
   const { themeSig } = useTheme();
@@ -25,7 +34,12 @@ export const ColorPickers = component$(() => {
     themeSig.value = serializeThemeConfig(themeConfigSig.value);
   });
 
-  const renderGrid = (
+  const setBase = $((color: string) => {
+    themeConfigSig.value.baseColor = color;
+    themeSig.value = serializeThemeConfig(themeConfigSig.value);
+  });
+
+  const renderShadeGrid = (
     entries: string[],
     prefix: string,
     activeValue: string,
@@ -61,31 +75,40 @@ export const ColorPickers = component$(() => {
   return (
     <Popover.Root flip floating="bottom-end" gutter={8}>
       <Popover.Trigger
-        aria-label="Choose primary and secondary colors"
+        aria-label="Choose primary, secondary, and base colors"
         class={cn(
-          'inline-flex h-10 w-20 items-center justify-center rounded-md border border-input bg-background shadow-sm transition-colors hover:bg-accent focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none',
+          'inline-flex h-10 w-16 items-center justify-center rounded-md border border-input bg-background shadow-sm transition-colors hover:bg-accent focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none',
         )}
       >
-        <span class="flex h-5 w-12 overflow-hidden rounded-sm border border-black/10 shadow-inner">
+        <span class="flex flex-col gap-px overflow-hidden rounded-sm border border-black/10 shadow-inner">
           <span
-            class="block h-full w-1/2"
+            class="block h-4 w-10"
             style={{ backgroundColor: 'var(--primary)' }}
+            aria-hidden="true"
           />
           <span
-            class="block h-full w-1/2"
+            class="block h-2 w-10"
             style={{ backgroundColor: 'var(--secondary)' }}
+            aria-hidden="true"
+          />
+          <span
+            class="block h-1 w-10"
+            style={{ backgroundColor: 'var(--base-swatch, var(--muted-foreground))' }}
+            aria-hidden="true"
           />
         </span>
       </Popover.Trigger>
 
       <Popover.Panel class="!w-auto max-w-[calc(100vw-1rem)]">
         <Tabs.Root>
-          <Tabs.List class="mb-2 grid w-full grid-cols-2">
+          <Tabs.List class="mb-2 grid w-full grid-cols-3">
             <Tabs.Tab>Primary</Tabs.Tab>
             <Tabs.Tab>Secondary</Tabs.Tab>
+            <Tabs.Tab>Base</Tabs.Tab>
           </Tabs.List>
+
           <Tabs.Panel>
-            {renderGrid(
+            {renderShadeGrid(
               Object.values(ThemePrimaryColors),
               'primary-',
               themeConfigSig.value.primaryColor ?? '',
@@ -93,14 +116,43 @@ export const ColorPickers = component$(() => {
               'primary',
             )}
           </Tabs.Panel>
+
           <Tabs.Panel>
-            {renderGrid(
+            {renderShadeGrid(
               Object.values(ThemeSecondaryColors),
               'secondary-',
               themeConfigSig.value.secondaryColor ?? '',
               setSecondary,
               'secondary',
             )}
+          </Tabs.Panel>
+
+          <Tabs.Panel>
+            <div class="flex items-center gap-2 py-1">
+              {Object.values(ThemeBaseColors).map((bc: string) => {
+                const isActive = themeConfigSig.value.baseColor === bc;
+                return (
+                  <Button
+                    key={bc}
+                    look="ghost"
+                    size="icon"
+                    onClick$={() => setBase(bc)}
+                    aria-label={`Set base to ${bc.replace('base-', '')}`}
+                    class={cn(
+                      'flex h-8 w-8 items-center justify-center rounded-md',
+                      isActive && 'ring-2 ring-ring',
+                    )}
+                  >
+                    <span
+                      class={cn(
+                        'flex h-5 w-5 rounded-sm border border-black/10',
+                        BASE_SWATCH_CLASS[bc],
+                      )}
+                    />
+                  </Button>
+                );
+              })}
+            </div>
           </Tabs.Panel>
         </Tabs.Root>
       </Popover.Panel>
