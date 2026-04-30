@@ -44,6 +44,16 @@ const buildCombinedUrl = () => {
   return `https://fonts.googleapis.com/css2?${parts.join('&')}&display=swap`;
 };
 
+const applyFontToDocument = (family: string) => {
+  if (family) {
+    document.documentElement.style.setProperty('--font-sans', fontStack(family));
+    document.documentElement.style.fontFamily = fontStack(family);
+  } else {
+    document.documentElement.style.removeProperty('--font-sans');
+    document.documentElement.style.fontFamily = '';
+  }
+};
+
 export const FontPicker = component$(() => {
   const currentSig = useSignal('System Default');
 
@@ -73,23 +83,13 @@ export const FontPicker = component$(() => {
       const match = FONTS.find((f) => f.name === saved);
       if (match) {
         currentSig.value = match.name;
-        applyToDocument(match.family);
+        applyFontToDocument(match.family);
       }
     }
   });
 
-  const applyToDocument = (family: string) => {
-    if (family) {
-      document.documentElement.style.setProperty('--font-sans', fontStack(family));
-      document.documentElement.style.fontFamily = fontStack(family);
-    } else {
-      document.documentElement.style.removeProperty('--font-sans');
-      document.documentElement.style.fontFamily = '';
-    }
-  };
-
   const pick = $((font: FontEntry) => {
-    applyToDocument(font.family);
+    applyFontToDocument(font.family);
     localStorage.setItem(STORAGE_KEY, font.name);
     currentSig.value = font.name;
   });
