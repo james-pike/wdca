@@ -59,11 +59,13 @@ export const PageBuilder = component$<{ initialBlocks: Block[] }>(({ initialBloc
     document.cookie = `${STORAGE_KEY}=${encodeURIComponent(serialized)}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
   });
 
-  // After hydration, prefer localStorage if it diverges from the cookie-seeded
-  // layout (e.g. the cookie was dropped for exceeding ~4 KB). When they match —
-  // the common case — nothing changes, so there's no flash.
-  // eslint-disable-next-line qwik/no-use-visible-task -- reconcile durable storage post-hydration
+  // The cookie is the SSR source of truth, so when it's present we trust the
+  // server-rendered layout and do NOT touch state — that's what keeps refresh
+  // flash-free. Only fall back to localStorage when the cookie is missing (e.g.
+  // it was dropped for exceeding ~4 KB), so big layouts still recover.
+  // eslint-disable-next-line qwik/no-use-visible-task -- recover layout only when the cookie was dropped
   useVisibleTask$(() => {
+    if (document.cookie.includes(`${STORAGE_KEY}=`)) return;
     const saved = localStorage.getItem(STORAGE_KEY);
     if (!saved || saved === JSON.stringify(state.blocks)) return;
     try {
