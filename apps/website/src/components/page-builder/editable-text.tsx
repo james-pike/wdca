@@ -1,4 +1,4 @@
-import { component$, type QRL } from '@builder.io/qwik';
+import { component$, type QRL, useSignal, useVisibleTask$ } from '@builder.io/qwik';
 import { cn } from '@qwik-ui/utils';
 
 export interface EditableTextProps {
@@ -17,17 +17,36 @@ export interface EditableTextProps {
 }
 
 /**
- * Inline-editable text. In edit mode the element becomes `contentEditable` and
- * commits to the store on blur (committing on blur, not on every keystroke,
- * keeps the caret from jumping when the store re-renders).
+ * Inline-editable text.
+ *
+ * Commits on every keystroke so a refresh mid-edit never loses the change. The
+ * tricky part is the caret: if the live value were rendered as reactive JSX
+ * children, each commit would make Qwik reconcile the text node and reset the
+ * caret to the start. So the rendered children are a one-time snapshot taken at
+ * mount (enough for SSR / no-flash), and the *current* value is consumed only
+ * inside a tracked task that writes the DOM imperatively — and never while the
+ * element is focused. The element the user types into is therefore left alone.
  */
 export const EditableText = component$<EditableTextProps>((props) => {
   // Capitalized so Qwik treats the string as the intrinsic tag to render.
   const Tag = (props.tag ?? 'span') as 'span';
+  const ref = useSignal<HTMLElement>();
+  const focused = useSignal(false);
+  // Snapshot for the initial (SSR) render only; not updated reactively.
+  const initial = useSignal(props.value);
+
+  // Reflect external value changes (reset, or edits made elsewhere) into the
+  // DOM — but never while focused, so the caret is never disturbed mid-edit.
+  // eslint-disable-next-line qwik/no-use-visible-task -- imperative DOM sync to protect the caret
+  useVisibleTask$(({ track }) => {
+    const v = track(() => props.value);
+    const el = ref.value;
+    if (el && !focused.value && el.innerText !== v) el.innerText = v;
+  });
 
   return (
     <Tag
-      // Re-key per field so Qwik keeps element identity stable across renders.
+      ref={ref}
       key={props.field}
       // `plaintext-only` (paste without markup) is valid HTML but missing from
       // Qwik's contentEditable union, so cast it.
@@ -38,15 +57,17 @@ export const EditableText = component$<EditableTextProps>((props) => {
         props.editing &&
           'cursor-text rounded-sm outline-none ring-offset-2 ring-offset-background transition-shadow hover:ring-1 hover:ring-primary/40 focus:ring-2 focus:ring-primary/70',
       )}
+      onFocus$={() => (focused.value = true)}
       onKeyDown$={(e) => {
         if (!props.multiline && e.key === 'Enter') e.preventDefault();
       }}
+      onInput$={(_, el) => props.set$(props.field, el.innerText.replace(/\n$/, ''))}
       onBlur$={(_, el) => {
-        const text = el.innerText.replace(/\n$/, '');
-        if (text !== props.value) props.set$(props.field, text);
+        focused.value = false;
+        props.set$(props.field, el.innerText.replace(/\n$/, ''));
       }}
     >
-      {props.value}
+      {initial.value}
     </Tag>
   );
 });

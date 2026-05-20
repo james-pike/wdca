@@ -7,6 +7,7 @@ import {
   useSignal,
   useStore,
   useTask$,
+  useVisibleTask$,
 } from '@builder.io/qwik';
 import { isServer } from '@builder.io/qwik/build';
 import { cn } from '@qwik-ui/utils';
@@ -25,9 +26,12 @@ import type { Block } from './types';
 import { INSERTABLE_TYPES, REGISTRY, createInitialBlocks } from './registry';
 
 /**
- * Cookie (not localStorage) so the server can read the saved layout during SSR
- * and render it directly — no flash of the default layout on refresh. The
- * matching read lives in the route's `usePageBlocks` loader.
+ * Two-tier persistence:
+ *  - cookie: read by the route's `usePageBlocks` loader so SSR renders the saved
+ *    layout directly (no flash). Capped at ~4 KB by the browser.
+ *  - localStorage: the durable copy with no size cap; adopted on the client if
+ *    the cookie ever comes back stale or oversized, so edits can't silently
+ *    vanish on large pages.
  */
 export const STORAGE_KEY = 'qwikui-page-blocks';
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 year
@@ -47,12 +51,27 @@ export const PageBuilder = component$<{ initialBlocks: Block[] }>(({ initialBloc
   });
 
   // Persist on any change. JSON.stringify in track() subscribes to every nested
-  // prop, so inline text edits are saved too. Writing the cookie client-side is
-  // instant; the next server render picks it up.
+  // prop, so inline text edits are saved too.
   useTask$(({ track }) => {
     const serialized = track(() => JSON.stringify(state.blocks));
     if (isServer) return;
+    localStorage.setItem(STORAGE_KEY, serialized);
     document.cookie = `${STORAGE_KEY}=${encodeURIComponent(serialized)}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
+  });
+
+  // After hydration, prefer localStorage if it diverges from the cookie-seeded
+  // layout (e.g. the cookie was dropped for exceeding ~4 KB). When they match —
+  // the common case — nothing changes, so there's no flash.
+  // eslint-disable-next-line qwik/no-use-visible-task -- reconcile durable storage post-hydration
+  useVisibleTask$(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved || saved === JSON.stringify(state.blocks)) return;
+    try {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length) state.blocks = parsed as Block[];
+    } catch {
+      /* ignore malformed storage */
+    }
   });
 
   const updateProp$ = $((id: string, key: string, value: unknown) => {
@@ -296,6 +315,7 @@ const BuilderControls = component$<{ state: BuilderState }>(({ state }) => (
       title="Reset to default"
       onClick$={(e) => {
         e.stopPropagation();
+        localStorage.removeItem(STORAGE_KEY);
         document.cookie = `${STORAGE_KEY}=; path=/; max-age=0; SameSite=Lax`;
         state.blocks = createInitialBlocks();
         state.selectedId = null;
