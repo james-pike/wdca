@@ -46,7 +46,7 @@ export const ColorPickers = component$(() => {
     onPick: QRL<(value: string) => void>,
     roleLabel: string,
   ) => (
-    <div class="grid grid-cols-[repeat(22,0fr)] gap-0.5">
+    <div class="grid grid-cols-[repeat(22,0.75rem)] gap-0.5">
       {entries.map((value) => {
         const shade = value.replace(prefix, '');
         if (shade.endsWith('-100') || shade.endsWith('-200')) {
@@ -73,7 +73,7 @@ export const ColorPickers = component$(() => {
   );
 
   return (
-    <Popover.Root flip floating="bottom-end" gutter={8}>
+    <Popover.Root flip shift floating="bottom-end" gutter={8}>
       <Popover.Trigger
         aria-label="Choose primary, secondary, and base colors"
         class={cn(
@@ -99,7 +99,7 @@ export const ColorPickers = component$(() => {
         </span>
       </Popover.Trigger>
 
-      <Popover.Panel class="!w-auto max-w-[calc(100vw-1rem)]">
+      <Popover.Panel class="w-[22rem] max-w-[calc(100vw-1rem)]">
         <Tabs.Root>
           <Tabs.List class="mb-2 grid w-full grid-cols-3">
             <Tabs.Tab>Primary</Tabs.Tab>

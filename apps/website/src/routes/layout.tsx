@@ -31,7 +31,11 @@ export default component$(() => {
             class="sticky top-16 mr-4 hidden h-[calc(100vh-64px)] overflow-auto lg:block 2xl:ml-0"
           />
           <MDXProvider components={components}>
-            <main data-pagefind-body class="px-6 py-8 lg:px-12">
+            <main
+              data-pagefind-body
+              class="mx-auto w-full px-6 py-8 lg:px-12"
+              style={{ maxWidth: 'var(--container-max, 80rem)' }}
+            >
               <Slot />
             </main>
           </MDXProvider>

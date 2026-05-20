@@ -12,12 +12,19 @@ import { ThemeProvider } from '@qwik-ui/themes';
 import {
   ThemeBaseColors,
   ThemeBorderRadiuses,
+  ThemeBorderWidths,
+  ThemeContainerWidths,
   ThemeFontFamilies,
   ThemeFonts,
+  ThemeHeadingFontFamilies,
   ThemeModes,
+  ThemeMotions,
   ThemePrimaryColors,
   ThemeSecondaryColors,
+  ThemeShadows,
   ThemeStyles,
+  ThemeTrackings,
+  ThemeTypeScales,
 } from '@qwik-ui/utils';
 
 export default component$(() => {
@@ -70,7 +77,14 @@ export default component$(() => {
             ...Object.values(ThemePrimaryColors),
             ...Object.values(ThemeSecondaryColors),
             ...Object.values(ThemeBorderRadiuses),
+            ...Object.values(ThemeBorderWidths),
+            ...Object.values(ThemeShadows),
             ...Object.values(ThemeFontFamilies),
+            ...Object.values(ThemeHeadingFontFamilies),
+            ...Object.values(ThemeTypeScales),
+            ...Object.values(ThemeTrackings),
+            ...Object.values(ThemeContainerWidths),
+            ...Object.values(ThemeMotions),
           ]}
         >
           <RouterOutlet />

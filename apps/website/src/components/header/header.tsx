@@ -27,8 +27,15 @@ import { Button } from '@qwik-ui/styled';
 import MakeItYours from '../make-it-yours/make-it-yours';
 import { ColorPickers } from '../color-pickers/color-pickers';
 import { FontPicker } from '../font-picker/font-picker';
+import { HeadingFontPicker } from '../heading-font-picker/heading-font-picker';
 import { StylePicker } from '../header-pickers/style-picker';
 import { RadiusPicker } from '../header-pickers/radius-picker';
+import { BorderWidthPicker } from '../header-pickers/border-width-picker';
+import { ShadowPicker } from '../header-pickers/shadow-picker';
+import { TypeScalePicker } from '../header-pickers/type-scale-picker';
+import { TrackingPicker } from '../header-pickers/tracking-picker';
+import { ContainerWidthPicker } from '../header-pickers/container-width-picker';
+import { MotionPicker } from '../header-pickers/motion-picker';
 // import { SearchModal } from '../search/search';
 export interface HeaderProps {
   showVersion?: boolean;
@@ -166,8 +173,15 @@ export default component$(({ showVersion = false }: HeaderProps) => {
           <div class="xs:space-x-4 flex items-center space-x-1">
             <ColorPickers />
             <FontPicker />
+            <HeadingFontPicker />
             <StylePicker />
             <RadiusPicker />
+            <BorderWidthPicker />
+            <ShadowPicker />
+            <TypeScalePicker />
+            <TrackingPicker />
+            <ContainerWidthPicker />
+            <MotionPicker />
             <MakeItYours />
             {/* <SearchModal /> */}
             <DarkModeToggle />

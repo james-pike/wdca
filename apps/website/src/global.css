@@ -332,8 +332,6 @@
     --card-foreground: var(--color-slate-900);
     --border: var(--color-slate-200);
     --input: var(--color-slate-200);
-    --secondary: var(--color-slate-900);
-    --secondary-foreground: white;
     --accent: var(--color-slate-100);
     --accent-foreground: var(--color-slate-900);
     --alert: var(--color-red-500);
@@ -351,8 +349,6 @@
     --card-foreground: var(--color-slate-50);
     --border: var(--color-slate-800);
     --input: var(--color-slate-800);
-    --secondary: var(--color-slate-100);
-    --secondary-foreground: black;
     --accent: var(--color-slate-700);
     --accent-foreground: var(--color-slate-50);
     --alert: var(--color-red-500);
@@ -371,8 +367,6 @@
     --card-foreground: var(--color-gray-950);
     --border: var(--color-gray-200);
     --input: var(--color-gray-200);
-    --secondary: var(--color-gray-950);
-    --secondary-foreground: white;
     --accent: var(--color-gray-100);
     --accent-foreground: var(--color-gray-950);
     --alert: var(--color-red-500);
@@ -390,8 +384,6 @@
     --card-foreground: var(--color-gray-50);
     --border: var(--color-gray-800);
     --input: var(--color-gray-800);
-    --secondary: var(--color-gray-100);
-    --secondary-foreground: black;
     --accent: var(--color-gray-700);
     --accent-foreground: var(--color-gray-50);
     --alert: var(--color-red-500);
@@ -410,8 +402,6 @@
     --card-foreground: var(--color-zinc-900);
     --border: var(--color-zinc-200);
     --input: var(--color-zinc-200);
-    --secondary: var(--color-zinc-900);
-    --secondary-foreground: white;
     --accent: var(--color-zinc-100);
     --accent-foreground: var(--color-zinc-900);
     --alert: var(--color-red-500);
@@ -429,8 +419,6 @@
     --card-foreground: var(--color-zinc-50);
     --border: var(--color-zinc-800);
     --input: var(--color-zinc-800);
-    --secondary: var(--color-zinc-100);
-    --secondary-foreground: black;
     --accent: var(--color-zinc-700);
     --accent-foreground: var(--color-zinc-50);
     --alert: var(--color-red-500);
@@ -449,8 +437,6 @@
     --card-foreground: var(--color-neutral-900);
     --border: var(--color-neutral-200);
     --input: var(--color-neutral-200);
-    --secondary: var(--color-neutral-900);
-    --secondary-foreground: white;
     --accent: var(--color-neutral-100);
     --accent-foreground: var(--color-neutral-900);
     --alert: var(--color-red-500);
@@ -468,8 +454,6 @@
     --card-foreground: var(--color-neutral-50);
     --border: var(--color-neutral-800);
     --input: var(--color-neutral-800);
-    --secondary: var(--color-neutral-100);
-    --secondary-foreground: black;
     --accent: var(--color-neutral-700);
     --accent-foreground: var(--color-neutral-50);
     --alert: var(--color-red-500);
@@ -488,8 +472,6 @@
     --card-foreground: var(--color-stone-900);
     --border: var(--color-stone-200);
     --input: var(--color-stone-200);
-    --secondary: var(--color-stone-900);
-    --secondary-foreground: white;
     --accent: var(--color-stone-100);
     --accent-foreground: var(--color-stone-900);
     --alert: var(--color-red-500);
@@ -507,8 +489,6 @@
     --card-foreground: var(--color-stone-50);
     --border: var(--color-stone-800);
     --input: var(--color-stone-800);
-    --secondary: var(--color-stone-100);
-    --secondary-foreground: black;
     --accent: var(--color-stone-700);
     --accent-foreground: var(--color-stone-50);
     --alert: var(--color-red-500);
@@ -2333,3 +2313,108 @@
 .base-neutral { --base-swatch: var(--color-neutral-500); }
 .base-zinc { --base-swatch: var(--color-zinc-500); }
 .base-stone { --base-swatch: var(--color-stone-500); }
+
+/* ---------------------------------------------------------------------------
+   Extended style settings — applied as classes on <html> by ThemeProvider.
+   Unlayered so they win over Tailwind utilities, mirroring the qfont- block.
+   Each is an independent CSS variable so it never fights the style-preset
+   specificity (.brutalist.brutalist etc.) up in @layer base.
+   --------------------------------------------------------------------------- */
+
+/* Heading font family (separate from the body font). `headfont-inherit` is the
+   default and leaves headings using the body font. `:where()` keeps specificity
+   at 0 so any explicit heading styling still wins. */
+.headfont-inherit { --heading-font: inherit; }
+.headfont-system { --heading-font: ui-sans-serif, system-ui, sans-serif; }
+.headfont-inter { --heading-font: 'Inter', system-ui, sans-serif; }
+.headfont-roboto { --heading-font: 'Roboto', system-ui, sans-serif; }
+.headfont-open-sans { --heading-font: 'Open Sans', system-ui, sans-serif; }
+.headfont-poppins { --heading-font: 'Poppins', system-ui, sans-serif; }
+.headfont-montserrat { --heading-font: 'Montserrat', system-ui, sans-serif; }
+.headfont-dm-sans { --heading-font: 'DM Sans', system-ui, sans-serif; }
+.headfont-space-grotesk { --heading-font: 'Space Grotesk', system-ui, sans-serif; }
+.headfont-nunito { --heading-font: 'Nunito', system-ui, sans-serif; }
+.headfont-work-sans { --heading-font: 'Work Sans', system-ui, sans-serif; }
+.headfont-lora { --heading-font: 'Lora', Georgia, serif; }
+.headfont-playfair-display { --heading-font: 'Playfair Display', Georgia, serif; }
+.headfont-merriweather { --heading-font: 'Merriweather', Georgia, serif; }
+.headfont-jetbrains-mono { --heading-font: 'JetBrains Mono', ui-monospace, monospace; }
+.headfont-fira-code { --heading-font: 'Fira Code', ui-monospace, monospace; }
+:where(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--heading-font, inherit);
+}
+
+/* Global type scale — multiplies the root font size (everything sized in rem). */
+.scale-sm { font-size: 93.75%; }  /* ~15px */
+.scale-base { font-size: 100%; }  /* 16px (default) */
+.scale-lg { font-size: 112.5%; }  /* ~18px */
+
+/* Letter spacing (tracking). Inherits from <html> to all text. */
+.tracking-tight { letter-spacing: -0.015em; }
+.tracking-normal { letter-spacing: normal; }
+.tracking-wide { letter-spacing: 0.04em; }
+
+/* Max content width. Exposes --container-max; layout wrappers should read it,
+   e.g. `max-width: var(--container-max, 80rem)`. */
+.container-sm { --container-max: 48rem; }
+.container-md { --container-max: 64rem; }
+.container-lg { --container-max: 80rem; }
+.container-full { --container-max: 100%; }
+
+/* Motion preference. `motion-none` kills transitions/animations; `motion-reduced`
+   collapses them to near-instant. Scoped to descendants of <html>.<class>. */
+.motion-none * {
+  transition-duration: 0s !important;
+  animation-duration: 0s !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+}
+.motion-reduced * {
+  transition-duration: 0.08s !important;
+  animation-duration: 0.08s !important;
+}
+
+/* Border width override. `border-width-auto` (default) is omitted from the
+   string and leaves the style preset in control. The explicit values use
+   !important to win over the preset's `--border-width` (e.g. .brutalist.brutalist),
+   which feeds Tailwind's `border` utility via --default-border-width. */
+.border-width-0 { --border-width: 0px !important; }
+.border-width-1 { --border-width: 1px !important; }
+.border-width-2 { --border-width: 2px !important; }
+
+/* Elevation / shadow scale override. `shadow-auto` (default) defers to the
+   preset. The others replace the whole --shadow-* scale (consumed by Tailwind's
+   shadow-* utilities) and use !important to win over the preset. */
+.shadow-none {
+  --shadow-base: none !important;
+  --shadow-2xs: none !important;
+  --shadow-xs: none !important;
+  --shadow-sm: none !important;
+  --shadow-md: none !important;
+  --shadow-lg: none !important;
+  --shadow-xl: none !important;
+  --shadow-2xl: none !important;
+  --shadow-inner: none !important;
+}
+.shadow-soft {
+  --shadow-base: 0 1px 2px rgb(0 0 0 / 0.04) !important;
+  --shadow-2xs: 0 1px 2px rgb(0 0 0 / 0.04) !important;
+  --shadow-xs: 0 2px 4px rgb(0 0 0 / 0.05) !important;
+  --shadow-sm: 0 2px 8px rgb(0 0 0 / 0.06) !important;
+  --shadow-md: 0 4px 12px rgb(0 0 0 / 0.08) !important;
+  --shadow-lg: 0 8px 24px rgb(0 0 0 / 0.1) !important;
+  --shadow-xl: 0 12px 32px rgb(0 0 0 / 0.12) !important;
+  --shadow-2xl: 0 20px 48px rgb(0 0 0 / 0.16) !important;
+  --shadow-inner: inset 0 2px 4px rgb(0 0 0 / 0.05) !important;
+}
+.shadow-strong {
+  --shadow-base: 0 1px 2px rgb(0 0 0 / 0.1) !important;
+  --shadow-2xs: 0 2px 4px rgb(0 0 0 / 0.12) !important;
+  --shadow-xs: 0 4px 6px rgb(0 0 0 / 0.14) !important;
+  --shadow-sm: 0 6px 10px rgb(0 0 0 / 0.18) !important;
+  --shadow-md: 0 10px 20px rgb(0 0 0 / 0.22) !important;
+  --shadow-lg: 0 16px 30px rgb(0 0 0 / 0.26) !important;
+  --shadow-xl: 0 24px 44px rgb(0 0 0 / 0.3) !important;
+  --shadow-2xl: 0 32px 64px rgb(0 0 0 / 0.36) !important;
+  --shadow-inner: inset 0 2px 6px rgb(0 0 0 / 0.18) !important;
+}
