@@ -42,7 +42,9 @@ export default defineConfig(async () => {
           outDir: '../../dist/apps/website/client',
         },
         ssr: {
-          outDir: '../../dist/apps/website/server',
+          // Overridable so deploy adapters (e.g. vercel-edge) can redirect the
+          // SSR bundle into their own output dir.
+          outDir: process.env.QWIK_SSR_OUTDIR ?? '../../dist/apps/website/server',
         },
       }),
       tsconfigPaths({ root: '../../' }),

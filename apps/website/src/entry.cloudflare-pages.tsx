@@ -7,16 +7,13 @@
  * - https://qwik.builder.io/integrations/deployments/cloudflare-pages/
  *
  */
-import {
-  createQwikCity,
-  type PlatformCloudflarePages,
-} from '@builder.io/qwik-city/middleware/cloudflare-pages';
+import { createQwikCity } from '@builder.io/qwik-city/middleware/cloudflare-pages';
 import qwikCityPlan from '@qwik-city-plan';
 import render from './entry.ssr';
 
-declare global {
-  type QwikCityPlatform = PlatformCloudflarePages;
-}
+// The `QwikCityPlatform` global is intentionally not declared here: multiple
+// adapter entries (vercel-edge, cloudflare-pages) coexist in this project and
+// only one may declare the global, or typecheck fails with a duplicate.
 
 const fetch = createQwikCity({ render, qwikCityPlan });
 
