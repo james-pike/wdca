@@ -59,13 +59,14 @@ export const PageBuilder = component$<{ initialBlocks: Block[] }>(({ initialBloc
     document.cookie = `${STORAGE_KEY}=${encodeURIComponent(serialized)}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
   });
 
-  // The cookie is the SSR source of truth, so when it's present we trust the
-  // server-rendered layout and do NOT touch state — that's what keeps refresh
-  // flash-free. Only fall back to localStorage when the cookie is missing (e.g.
-  // it was dropped for exceeding ~4 KB), so big layouts still recover.
-  // eslint-disable-next-line qwik/no-use-visible-task -- recover layout only when the cookie was dropped
+  // localStorage is the source of truth on the client. This site is statically
+  // prerendered (no server at runtime), so SSR can't read the per-user cookie —
+  // the layout MUST be restored here on the client. When SSR already matched
+  // (dev / a future server runtime) the strings are equal and this is a no-op,
+  // so there's no flash; on the static build it adopts the saved layout (brief
+  // flash). Eliminating that flash requires server rendering — see notes.
+  // eslint-disable-next-line qwik/no-use-visible-task -- client-side layout restore for static hosting
   useVisibleTask$(() => {
-    if (document.cookie.includes(`${STORAGE_KEY}=`)) return;
     const saved = localStorage.getItem(STORAGE_KEY);
     if (!saved || saved === JSON.stringify(state.blocks)) return;
     try {
