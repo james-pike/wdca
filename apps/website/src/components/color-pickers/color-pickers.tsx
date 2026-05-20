@@ -20,6 +20,55 @@ const BASE_SWATCH_CLASS: Record<string, string> = {
   'base-stone': 'bg-stone-500',
 };
 
+interface ColorPreset {
+  name: string;
+  primary: string;
+  secondary: string;
+}
+
+/**
+ * Curated primary+secondary pairings grouped by classic colour-theory
+ * relationships on the wheel (Tailwind hue order ≈ red→rose). Each applies both
+ * roles at once so users get a balanced palette in one click.
+ */
+const PRESET_GROUPS: Array<{ group: string; hint: string; items: ColorPreset[] }> = [
+  {
+    group: 'Complementary',
+    hint: 'Opposite hues — high contrast',
+    items: [
+      { name: 'Ocean', primary: 'primary-blue-600', secondary: 'secondary-orange-500' },
+      { name: 'Regal', primary: 'primary-indigo-600', secondary: 'secondary-amber-500' },
+      { name: 'Garden', primary: 'primary-emerald-600', secondary: 'secondary-rose-500' },
+      { name: 'Grape', primary: 'primary-violet-600', secondary: 'secondary-lime-500' },
+      { name: 'Lagoon', primary: 'primary-teal-600', secondary: 'secondary-pink-500' },
+      { name: 'Flame', primary: 'primary-red-600', secondary: 'secondary-cyan-500' },
+    ],
+  },
+  {
+    group: 'Analogous',
+    hint: 'Neighbouring hues — calm, harmonious',
+    items: [
+      { name: 'Tide', primary: 'primary-blue-600', secondary: 'secondary-cyan-500' },
+      { name: 'Orchid', primary: 'primary-violet-600', secondary: 'secondary-fuchsia-500' },
+      { name: 'Pine', primary: 'primary-emerald-600', secondary: 'secondary-teal-500' },
+      { name: 'Ember', primary: 'primary-orange-600', secondary: 'secondary-amber-500' },
+    ],
+  },
+  {
+    group: 'Triadic',
+    hint: 'Evenly spaced — vibrant, balanced',
+    items: [
+      { name: 'Circus', primary: 'primary-red-600', secondary: 'secondary-blue-500' },
+      { name: 'Jewel', primary: 'primary-violet-600', secondary: 'secondary-emerald-500' },
+      { name: 'Fiesta', primary: 'primary-cyan-600', secondary: 'secondary-rose-500' },
+    ],
+  },
+];
+
+/** `primary-blue-600` / `secondary-orange-500` → `var(--color-blue-600)`. */
+const tokenColor = (token: string) =>
+  `var(--color-${token.replace(/^(primary|secondary)-/, '')})`;
+
 export const ColorPickers = component$(() => {
   const { themeSig } = useTheme();
   const themeConfigSig = useComputed$(() => parseThemeString(themeSig.value));
@@ -36,6 +85,12 @@ export const ColorPickers = component$(() => {
 
   const setBase = $((color: string) => {
     themeConfigSig.value.baseColor = color;
+    themeSig.value = serializeThemeConfig(themeConfigSig.value);
+  });
+
+  const applyPreset = $((primary: string, secondary: string) => {
+    themeConfigSig.value.primaryColor = primary;
+    themeConfigSig.value.secondaryColor = secondary;
     themeSig.value = serializeThemeConfig(themeConfigSig.value);
   });
 
@@ -101,11 +156,58 @@ export const ColorPickers = component$(() => {
 
       <Popover.Panel class="w-[22rem] max-w-[calc(100vw-1rem)]">
         <Tabs.Root>
-          <Tabs.List class="mb-2 grid w-full grid-cols-3">
+          <Tabs.List class="mb-2 grid w-full grid-cols-4">
+            <Tabs.Tab>Presets</Tabs.Tab>
             <Tabs.Tab>Primary</Tabs.Tab>
             <Tabs.Tab>Secondary</Tabs.Tab>
             <Tabs.Tab>Base</Tabs.Tab>
           </Tabs.List>
+
+          <Tabs.Panel>
+            <div class="max-h-[20rem] space-y-3 overflow-auto pr-1">
+              {PRESET_GROUPS.map((group) => (
+                <div key={group.group}>
+                  <div class="text-sm font-medium">{group.group}</div>
+                  <div class="mb-1.5 text-[11px] leading-tight text-muted-foreground">
+                    {group.hint}
+                  </div>
+                  <div class="grid grid-cols-4 gap-1">
+                    {group.items.map((preset) => {
+                      const isActive =
+                        themeConfigSig.value.primaryColor === preset.primary &&
+                        themeConfigSig.value.secondaryColor === preset.secondary;
+                      return (
+                        <Button
+                          key={preset.name}
+                          look="ghost"
+                          onClick$={() => applyPreset(preset.primary, preset.secondary)}
+                          aria-label={`Apply ${preset.name} palette`}
+                          class={cn(
+                            'flex h-auto flex-col items-center gap-1 rounded-md px-1 py-1.5',
+                            isActive && 'ring-2 ring-ring',
+                          )}
+                        >
+                          <span class="relative flex h-7 w-12 overflow-hidden rounded-md border border-black/10 shadow-inner">
+                            <span
+                              class="absolute inset-0"
+                              style={{ backgroundColor: tokenColor(preset.primary) }}
+                            />
+                            <span
+                              class="absolute right-0 bottom-0 h-4 w-7 rounded-tl-lg border-t border-l border-white/50"
+                              style={{ backgroundColor: tokenColor(preset.secondary) }}
+                            />
+                          </span>
+                          <span class="text-[10px] leading-none text-muted-foreground">
+                            {preset.name}
+                          </span>
+                        </Button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Tabs.Panel>
 
           <Tabs.Panel>
             {renderShadeGrid(
