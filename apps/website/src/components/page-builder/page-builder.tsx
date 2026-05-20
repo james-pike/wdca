@@ -7,7 +7,6 @@ import {
   useSignal,
   useStore,
   useTask$,
-  useVisibleTask$,
 } from '@builder.io/qwik';
 import { isServer } from '@builder.io/qwik/build';
 import { cn } from '@qwik-ui/utils';
@@ -25,7 +24,13 @@ import {
 import type { Block } from './types';
 import { INSERTABLE_TYPES, REGISTRY, createInitialBlocks } from './registry';
 
-const STORAGE_KEY = 'qwikui-page-blocks';
+/**
+ * Cookie (not localStorage) so the server can read the saved layout during SSR
+ * and render it directly — no flash of the default layout on refresh. The
+ * matching read lives in the route's `usePageBlocks` loader.
+ */
+export const STORAGE_KEY = 'qwikui-page-blocks';
+const COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 year
 
 interface BuilderState {
   blocks: Block[];
@@ -33,32 +38,21 @@ interface BuilderState {
   editing: boolean;
 }
 
-export const PageBuilder = component$(() => {
+export const PageBuilder = component$<{ initialBlocks: Block[] }>(({ initialBlocks }) => {
   const state = useStore<BuilderState>({
-    blocks: createInitialBlocks(),
+    // Seeded from the server loader, so SSR already renders the saved layout.
+    blocks: initialBlocks.length ? initialBlocks : createInitialBlocks(),
     selectedId: null,
     editing: true,
   });
 
-  // Load any saved layout once on the client (SSR renders the seed layout).
-  // eslint-disable-next-line qwik/no-use-visible-task -- read localStorage after hydration
-  useVisibleTask$(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (!saved) return;
-    try {
-      const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length) state.blocks = parsed as Block[];
-    } catch {
-      /* ignore malformed storage */
-    }
-  });
-
   // Persist on any change. JSON.stringify in track() subscribes to every nested
-  // prop, so inline text edits are saved too.
+  // prop, so inline text edits are saved too. Writing the cookie client-side is
+  // instant; the next server render picks it up.
   useTask$(({ track }) => {
     const serialized = track(() => JSON.stringify(state.blocks));
     if (isServer) return;
-    localStorage.setItem(STORAGE_KEY, serialized);
+    document.cookie = `${STORAGE_KEY}=${encodeURIComponent(serialized)}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
   });
 
   const updateProp$ = $((id: string, key: string, value: unknown) => {
@@ -302,7 +296,7 @@ const BuilderControls = component$<{ state: BuilderState }>(({ state }) => (
       title="Reset to default"
       onClick$={(e) => {
         e.stopPropagation();
-        localStorage.removeItem(STORAGE_KEY);
+        document.cookie = `${STORAGE_KEY}=; path=/; max-age=0; SameSite=Lax`;
         state.blocks = createInitialBlocks();
         state.selectedId = null;
       }}
