@@ -29,7 +29,9 @@ export const EditableText = component$<EditableTextProps>((props) => {
     <Tag
       // Re-key per field so Qwik keeps element identity stable across renders.
       key={props.field}
-      contentEditable={props.editing ? 'plaintext-only' : 'false'}
+      // `plaintext-only` (paste without markup) is valid HTML but missing from
+      // Qwik's contentEditable union, so cast it.
+      contentEditable={(props.editing ? 'plaintext-only' : 'false') as 'true'}
       spellcheck={false}
       class={cn(
         props.class,
