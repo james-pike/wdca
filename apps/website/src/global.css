@@ -40,6 +40,10 @@
     --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
     --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.01);
     --transform-press: scale(0.95);
+    /* Site chrome heights — single source of truth so the sticky offsets and
+       the fold-fill calc stay in sync with the actual header/tab-bar heights. */
+    --header-h: 4rem; /* 64px, matches the header's h-16 */
+    --tabbar-h: 2.75rem; /* 44px, matches the tab bar's h-11 */
   }
 
   .dark {
@@ -1439,4 +1443,16 @@
   &[data-closed] {
     animation: 500ms cubic-bezier(0.87, 0, 0.13, 1) 0s 1 normal forwards accordion-close;
   }
+}
+
+/*
+ * Fill the visible fold below the site chrome. Subtracts the header + tab-bar
+ * heights (the same vars those elements use) from the small viewport height, so
+ * a lead block owns the fold on any phone size. `svh` avoids the "100vh is too
+ * tall while the address bar shows" overflow; the plain `vh` line above is a
+ * fallback for browsers without small-viewport units (< Chrome 108 / iOS 15.4).
+ */
+.fill-fold {
+  min-height: calc(100vh - var(--header-h) - var(--tabbar-h));
+  min-height: calc(100svh - var(--header-h) - var(--tabbar-h));
 }

@@ -128,7 +128,7 @@ export default component$(({ showVersion = false }: HeaderProps) => {
   return (
     <Modal.Root
       class={cn(
-        'sticky top-0 z-10 flex h-16 justify-center border-b bg-background',
+        'sticky top-0 z-10 flex h-[var(--header-h)] justify-center border-b bg-background',
         themeSig.value?.includes('brutalist') && 'border-b-2',
       )}
       bind:show={isSidebarOpenedSig}
