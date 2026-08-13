@@ -14,6 +14,10 @@ import {
   TagRow,
   BulletList,
   Steps,
+  VizCard,
+  Sparkline,
+  BarChart,
+  Donut,
 } from './section-kit';
 
 /**
@@ -126,6 +130,29 @@ export const MarketingSections = component$(() => {
                 { value: '2.1s→0.6s', label: 'median LCP' },
               ]}
             />
+          </Band>
+
+          <Band title="Twelve months, blended" lead="Revenue, channel mix and conversion across recent engagements.">
+            <div class="grid gap-4 md:grid-cols-3">
+              <VizCard caption="REVENUE · 12 MO" value="+64%">
+                <Sparkline data={[20, 24, 22, 28, 30, 34, 33, 40, 44, 47, 52, 60]} />
+              </VizCard>
+              <VizCard caption="CHANNEL MIX">
+                <BarChart
+                  bars={[
+                    { label: 'PPC', value: 72 },
+                    { label: 'SEO', value: 88 },
+                    { label: 'Social', value: 54 },
+                    { label: 'Email', value: 63 },
+                  ]}
+                />
+              </VizCard>
+              <VizCard caption="CONVERSION">
+                <div class="flex justify-center">
+                  <Donut value={18} label="visit → paid" />
+                </div>
+              </VizCard>
+            </div>
           </Band>
 
           <Band title="Where the lift comes from" lead="Median improvement across engagements after 90 days.">

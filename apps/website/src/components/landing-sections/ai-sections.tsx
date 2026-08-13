@@ -14,6 +14,10 @@ import {
   TagRow,
   BulletList,
   PricingCards,
+  VizCard,
+  Donut,
+  BarChart,
+  ScatterPlot,
 } from './section-kit';
 
 /**
@@ -132,6 +136,35 @@ export const AiSections = component$(() => {
                 { mono: 'Cd', name: 'Code model', note: 'refactors & tests', color: '#c53030' },
               ]}
             />
+          </Band>
+
+          <Band title="Models at a glance" lead="Quality, throughput and how the embedding space clusters.">
+            <div class="grid gap-4 md:grid-cols-3">
+              <VizCard caption="EVAL SCORE">
+                <div class="flex justify-center">
+                  <Donut value={94} label="quality" />
+                </div>
+              </VizCard>
+              <VizCard caption="THROUGHPUT · TOK/S">
+                <BarChart
+                  bars={[
+                    { label: 'Frontier', value: 42 },
+                    { label: 'Fast', value: 96 },
+                    { label: 'Open', value: 74 },
+                  ]}
+                />
+              </VizCard>
+              <VizCard caption="EMBEDDINGS · 2D">
+                <ScatterPlot
+                  points={[
+                    { x: 20, y: 70, g: 0 }, { x: 26, y: 62, g: 0 }, { x: 18, y: 55, g: 0 }, { x: 30, y: 72, g: 0 },
+                    { x: 62, y: 30, g: 1 }, { x: 70, y: 38, g: 1 }, { x: 66, y: 22, g: 1 }, { x: 74, y: 30, g: 1 },
+                    { x: 48, y: 82, g: 2 }, { x: 55, y: 76, g: 2 }, { x: 44, y: 74, g: 2 },
+                    { x: 82, y: 66, g: 3 }, { x: 88, y: 58, g: 3 }, { x: 78, y: 54, g: 3 },
+                  ]}
+                />
+              </VizCard>
+            </div>
           </Band>
 
           <Band title="Frontier vs. fast" lead="Same interface, different trade-off. Pick per request, not per project.">

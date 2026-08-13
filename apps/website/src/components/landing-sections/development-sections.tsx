@@ -14,6 +14,10 @@ import {
   Steps,
   StatGrid,
   Accordion,
+  VizCard,
+  Sparkline,
+  Donut,
+  Heatmap,
 } from './section-kit';
 
 /**
@@ -262,6 +266,25 @@ export const DevelopmentSections = component$(() => {
                 { value: '99.9%', label: 'uptime targets met' },
               ]}
             />
+          </Band>
+
+          <Band title="Signals from last quarter" lead="Boring metrics, honestly reported.">
+            <div class="grid gap-4 md:grid-cols-3">
+              <VizCard caption="COMMITS · 24 WEEKS">
+                <Heatmap
+                  cols={24}
+                  data={Array.from({ length: 120 }, (_, i) => (i * 13 + 7) % 5)}
+                />
+              </VizCard>
+              <VizCard caption="BUILD TIME" value="1.2s">
+                <Sparkline data={[9, 7, 8, 6, 7, 5, 6, 4, 5, 4, 3, 4, 3]} />
+              </VizCard>
+              <VizCard caption="TEST COVERAGE">
+                <div class="flex justify-center">
+                  <Donut value={98} label="coverage" />
+                </div>
+              </VizCard>
+            </div>
           </Band>
 
           <Band title="What clients ask first">

@@ -540,3 +540,179 @@ export const TagRow = component$<{ tags: string[] }>(({ tags }) => (
     ))}
   </div>
 ));
+
+/* --------------------------------------------------------- data-viz graphics */
+
+/** Small card wrapper for a chart with a mono caption. */
+export const VizCard = component$<{ caption?: string; value?: string }>(
+  ({ caption, value }) => (
+    <div class="rounded-[calc(var(--border-radius)+0.5rem)] border bg-card p-4 text-card-foreground shadow-sm">
+      {(caption || value) && (
+        <div class="mb-3 flex items-baseline justify-between">
+          {caption && (
+            <span class="font-mono text-[0.6rem] tracking-[0.18em] text-muted-foreground">
+              {caption}
+            </span>
+          )}
+          {value && <span class="text-sm font-semibold text-primary">{value}</span>}
+        </div>
+      )}
+      <Slot />
+    </div>
+  ),
+);
+
+/** Line/area sparkline that draws itself on scroll. `data` values any scale. */
+export const Sparkline = component$<{ data: number[]; color?: string; area?: boolean }>(
+  ({ data, color = 'var(--primary)', area = true }) => {
+    const W = 100;
+    const H = 34;
+    const max = Math.max(...data);
+    const min = Math.min(...data);
+    const rng = max - min || 1;
+    const pts = data.map(
+      (v, i) =>
+        [
+          (i / (data.length - 1)) * W,
+          H - 3 - ((v - min) / rng) * (H - 6),
+        ] as const,
+    );
+    const line = pts.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
+    const fill = `${line} L${W},${H} L0,${H} Z`;
+    return (
+      <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" class="h-16 w-full">
+        {area && <path d={fill} fill={color} opacity="0.14" />}
+        <path
+          d={line}
+          class="viz-draw"
+          pathLength={100}
+          fill="none"
+          stroke={color}
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          vector-effect="non-scaling-stroke"
+        />
+      </svg>
+    );
+  },
+);
+
+/** Vertical bar chart; bars cycle the palette and grow on scroll. */
+export const BarChart = component$<{ bars: { label: string; value: number }[] }>(
+  ({ bars }) => {
+    const max = Math.max(...bars.map((b) => b.value)) || 1;
+    return (
+      <div class="flex h-44 items-end gap-2">
+        {bars.map((b, i) => (
+          <div key={i} class="flex flex-1 flex-col items-center gap-2">
+            <div class="flex w-full flex-1 items-end">
+              <div
+                class="viz-grow w-full rounded-t"
+                style={{ height: `${(b.value / max) * 100}%`, background: ACCENTS[i % 4].bg }}
+              />
+            </div>
+            <span class="w-full truncate text-center text-[0.6rem] text-muted-foreground">
+              {b.label}
+            </span>
+          </div>
+        ))}
+      </div>
+    );
+  },
+);
+
+/** Donut / radial gauge showing a 0–100 percentage. */
+export const Donut = component$<{ value: number; label?: string; color?: string }>(
+  ({ value, label, color = 'var(--primary)' }) => {
+    const r = 42;
+    const c = 2 * Math.PI * r;
+    const off = c * (1 - Math.max(0, Math.min(100, value)) / 100);
+    return (
+      <div class="relative inline-flex h-32 w-32 items-center justify-center">
+        <svg viewBox="0 0 100 100" class="h-full w-full -rotate-90">
+          <circle cx="50" cy="50" r={r} fill="none" stroke="var(--muted)" stroke-width="9" />
+          <circle
+            cx="50"
+            cy="50"
+            r={r}
+            fill="none"
+            stroke={color}
+            stroke-width="9"
+            stroke-linecap="round"
+            stroke-dasharray={c}
+            stroke-dashoffset={off}
+          />
+        </svg>
+        <div class="absolute text-center">
+          <div class="text-2xl font-bold">{value}%</div>
+          {label && <div class="text-[0.6rem] text-muted-foreground">{label}</div>}
+        </div>
+      </div>
+    );
+  },
+);
+
+/** Contribution-style heatmap. `data` = intensities 0–4, laid out in `cols`. */
+export const Heatmap = component$<{ data: number[]; cols?: number }>(({ data, cols = 24 }) => (
+  <div
+    class="grid gap-1"
+    style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
+  >
+    {data.map((v, i) => (
+      <span
+        key={i}
+        class="aspect-square rounded-[2px]"
+        style={{
+          background:
+            v <= 0
+              ? 'var(--muted)'
+              : `color-mix(in oklab, var(--primary) ${Math.min(v, 4) * 24 + 8}%, var(--muted))`,
+        }}
+      />
+    ))}
+  </div>
+));
+
+/** Scatter plot on light axes; points cycle the palette (group via `g`). */
+export const ScatterPlot = component$<{ points: { x: number; y: number; g?: number }[] }>(
+  ({ points }) => (
+    <svg viewBox="0 0 100 60" class="h-44 w-full">
+      <line x1="6" y1="54" x2="98" y2="54" stroke="var(--border)" stroke-width="0.4" />
+      <line x1="6" y1="4" x2="6" y2="54" stroke="var(--border)" stroke-width="0.4" />
+      {points.map((p, i) => (
+        <circle
+          key={i}
+          cx={6 + (p.x / 100) * 92}
+          cy={54 - (p.y / 100) * 50}
+          r="2"
+          fill={ACCENTS[(p.g ?? i) % 4].bg}
+          opacity="0.85"
+        />
+      ))}
+    </svg>
+  ),
+);
+
+/** Node/edge network graph. `nodes` in a 0–100 × 0–60 space; `edges` index pairs. */
+export const NetworkGraph = component$<{
+  nodes: { x: number; y: number }[];
+  edges: number[][];
+}>(({ nodes, edges }) => (
+  <svg viewBox="0 0 100 60" class="h-48 w-full overflow-visible">
+    {edges.map((e, i) => (
+      <line
+        key={i}
+        x1={nodes[e[0]].x}
+        y1={nodes[e[0]].y}
+        x2={nodes[e[1]].x}
+        y2={nodes[e[1]].y}
+        stroke="var(--border)"
+        stroke-width="0.5"
+      />
+    ))}
+    {nodes.map((n, i) => (
+      <circle key={i} cx={n.x} cy={n.y} r="2.6" fill={ACCENTS[i % 4].bg} />
+    ))}
+  </svg>
+));

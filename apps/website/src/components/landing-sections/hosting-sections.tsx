@@ -14,6 +14,11 @@ import {
   StatGrid,
   Accordion,
   PricingCards,
+  VizCard,
+  Sparkline,
+  Heatmap,
+  Donut,
+  NetworkGraph,
 } from './section-kit';
 
 /**
@@ -62,6 +67,22 @@ export const HostingSections = component$(() => {
                 { mono: 'JNB', name: 'Johannesburg', note: 'af-south', color: 'var(--primary)' },
               ]}
             />
+          </Band>
+
+          <Band title="The network, drawn" lead="Requests hop to the nearest edge, then home over a private backbone.">
+            <VizCard caption="EDGE FABRIC · 12 REGIONS">
+              <NetworkGraph
+                nodes={[
+                  { x: 18, y: 14 }, { x: 40, y: 8 }, { x: 66, y: 12 }, { x: 86, y: 20 },
+                  { x: 10, y: 34 }, { x: 50, y: 30 }, { x: 78, y: 40 },
+                  { x: 24, y: 52 }, { x: 46, y: 50 }, { x: 70, y: 54 },
+                ]}
+                edges={[
+                  [0, 1], [1, 2], [2, 3], [0, 4], [1, 5], [2, 6], [5, 8],
+                  [4, 7], [5, 6], [7, 8], [8, 9], [6, 9], [3, 6], [5, 9],
+                ]}
+              />
+            </VizCard>
           </Band>
 
           <Band title="Anycast the whole way down" lead="One IP, the nearest metal answers.">
@@ -114,6 +135,25 @@ export const HostingSections = component$(() => {
                 { t: 'fn', text: 'X-Edge-Cache: HIT · region=IAD · age=12s' },
               ]}
             />
+          </Band>
+
+          <Band title="Thirty days of edge" lead="Response time trending down, availability holding at four nines.">
+            <div class="grid gap-4 md:grid-cols-3">
+              <VizCard caption="P50 TTFB · 30D" value="24ms">
+                <Sparkline data={[38, 34, 36, 30, 31, 28, 27, 26, 25, 24, 24, 23]} />
+              </VizCard>
+              <VizCard caption="CACHE HIT" value="98.6%">
+                <div class="flex justify-center">
+                  <Donut value={99} label="edge cached" />
+                </div>
+              </VizCard>
+              <VizCard caption="UPTIME · 12 WEEKS">
+                <Heatmap
+                  cols={12}
+                  data={Array.from({ length: 60 }, (_, i) => (i % 17 === 0 ? 1 : 4))}
+                />
+              </VizCard>
+            </div>
           </Band>
 
           <Band title="Latency you can put in a budget" lead="p50 / p95 / p99 measured from real user traffic, last 30 days.">

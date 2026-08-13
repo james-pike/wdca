@@ -1538,12 +1538,33 @@
     transform: none;
   }
 }
+@keyframes viz-grow {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+@keyframes viz-draw {
+  from { stroke-dashoffset: 100; }
+  to { stroke-dashoffset: 0; }
+}
 @media (prefers-reduced-motion: no-preference) {
   @supports (animation-timeline: view()) {
     .reveal {
       animation: fx-reveal linear both;
       animation-timeline: view();
       animation-range: entry 0% cover 26%;
+    }
+    /* charts that grow / draw as they scroll into view */
+    .viz-grow {
+      transform-origin: bottom;
+      animation: viz-grow cubic-bezier(0.2, 0.7, 0.3, 1) both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 22%;
+    }
+    .viz-draw {
+      stroke-dasharray: 100;
+      animation: viz-draw ease-out both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 30%;
     }
   }
 }
