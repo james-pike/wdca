@@ -86,6 +86,40 @@ const ACCENT_COUNT: Record<string, number> = {
 };
 const ACCENT_VARS = ['var(--secondary)', 'var(--tertiary)', 'var(--quad)'];
 
+/** Background styles, amounts and focal positions (see the `.fx-*` classes). */
+const BACKDROPS: { id: string; label: string; preview: string }[] = [
+  { id: 'fx-mesh', label: 'Mesh', preview: 'radial-gradient(circle at 30% 20%, var(--primary), transparent 55%), radial-gradient(circle at 80% 80%, var(--tertiary), transparent 55%)' },
+  { id: 'fx-aurora', label: 'Aurora', preview: 'linear-gradient(115deg, var(--primary), var(--secondary), var(--tertiary))' },
+  { id: 'fx-dots', label: 'Dots', preview: 'radial-gradient(var(--primary) 1px, transparent 1.5px) 0 0 / 6px 6px, var(--card)' },
+  { id: 'fx-grid', label: 'Grid', preview: 'linear-gradient(var(--primary) 1px, transparent 1px) 0 0 / 8px 8px, linear-gradient(90deg, var(--primary) 1px, transparent 1px) 0 0 / 8px 8px, var(--card)' },
+  { id: 'fx-rays', label: 'Rays', preview: 'conic-gradient(from 0deg at 50% 50%, var(--primary), transparent 60deg, var(--secondary) 140deg, transparent 220deg, var(--tertiary) 300deg, var(--primary))' },
+  { id: 'fx-glow', label: 'Glow', preview: 'radial-gradient(circle at 50% 40%, var(--primary), transparent 60%)' },
+  { id: 'fx-none', label: 'None', preview: 'var(--card)' },
+];
+const FX_AMOUNTS: { id: string; label: string }[] = [
+  { id: 'fxa-1', label: 'Subtle' },
+  { id: '', label: 'Medium' },
+  { id: 'fxa-2', label: 'Bold' },
+];
+const FX_POS: { id: string; label: string }[] = [
+  { id: 'fxp-tl', label: '↖' },
+  { id: 'fxp-tr', label: '↗' },
+  { id: 'fxp-c', label: '⊙' },
+  { id: 'fxp-bl', label: '↙' },
+  { id: 'fxp-br', label: '↘' },
+];
+
+/** All non-base theme tokens (harmony + background fx) to carry across edits. */
+const extrasOf = (value: string | string[] | undefined): string[] => {
+  const arr = Array.isArray(value) ? value : (value ?? '').split(' ');
+  return arr.filter((c) => c.startsWith('harmony-') || c.startsWith('fx'));
+};
+/** First token with the given prefix, or '' — used to read the active fx state. */
+const pickToken = (value: string | string[] | undefined, prefix: string): string => {
+  const arr = Array.isArray(value) ? value : (value ?? '').split(' ');
+  return arr.find((c) => c.startsWith(prefix)) ?? '';
+};
+
 /**
  * Mobile-only sticky "style bar" for the design tab. It sits directly beneath
  * the hero fold; once scrolled up it sticks to the bottom of the tab bar (top =
@@ -101,7 +135,7 @@ export const StyleBar = component$(() => {
   const rootStore = useAppState();
   const { themeSig } = useTheme();
   // Which colour popover is open ('' = none). One at a time.
-  const open = useSignal<'base' | 'primary' | 'harmony' | ''>('');
+  const open = useSignal<'base' | 'primary' | 'harmony' | 'bg' | ''>('');
 
   const cfgSig = useComputed$((): ThemeConfig => {
     const value = themeSig.value;
@@ -123,7 +157,7 @@ export const StyleBar = component$(() => {
     return { font, mode, style, baseColor, primaryColor, borderRadius };
   });
 
-  // Rebuild the theme string from a patch, preserving the current harmony class.
+  // Rebuild the theme string from a patch, preserving harmony + background fx.
   const apply$ = $((patch: Partial<ThemeConfig>) => {
     const c = { ...cfgSig.value, ...patch };
     themeSig.value = [
@@ -133,15 +167,17 @@ export const StyleBar = component$(() => {
       c.baseColor,
       c.primaryColor,
       c.borderRadius,
-      harmonyOf(themeSig.value),
+      ...extrasOf(themeSig.value),
     ]
       .filter(Boolean)
       .join(' ');
   });
 
-  // Set (or clear) the colour-harmony class, keeping the rest of the config.
-  const applyHarmony$ = $((mode: string) => {
+  // Replace one kind of extra token (matched by `drop` prefixes) with `token`,
+  // keeping the base config and the other extras. Powers harmony + background.
+  const setExtra$ = $((token: string, dropPrefix: string) => {
     const c = cfgSig.value;
+    const kept = extrasOf(themeSig.value).filter((x) => !x.startsWith(dropPrefix));
     themeSig.value = [
       c.font,
       c.mode,
@@ -149,7 +185,8 @@ export const StyleBar = component$(() => {
       c.baseColor,
       c.primaryColor,
       c.borderRadius,
-      mode,
+      ...kept,
+      token,
     ]
       .filter(Boolean)
       .join(' ');
@@ -162,6 +199,11 @@ export const StyleBar = component$(() => {
   const accentVars = ACCENT_VARS.slice(0, accentCount);
   // Shrink each accent swatch as more appear so the cluster keeps its footprint.
   const accentPx = accentCount === 1 ? 24 : accentCount === 2 ? 18 : 14;
+  // Background fx state (style defaults to mesh when no token is present).
+  const fxStyle = pickToken(themeSig.value, 'fx-') || 'fx-mesh';
+  const fxAmt = pickToken(themeSig.value, 'fxa-');
+  const fxPos = pickToken(themeSig.value, 'fxp-');
+  const fxPreview = BACKDROPS.find((b) => b.id === fxStyle)?.preview ?? BACKDROPS[0].preview;
 
   return (
     <div
@@ -292,7 +334,7 @@ export const StyleBar = component$(() => {
                   type="button"
                   aria-pressed={harmony === h.id}
                   onClick$={() => {
-                    applyHarmony$(h.id);
+                    setExtra$(h.id, 'harmony-');
                     open.value = '';
                   }}
                   class="flex items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs transition-colors hover:bg-accent"
@@ -305,6 +347,95 @@ export const StyleBar = component$(() => {
                   {harmony === h.id && <LuCheck class="h-3.5 w-3.5 shrink-0 text-primary" />}
                 </button>
               ))}
+            </div>
+          </Popover>
+        )}
+      </div>
+
+      <Divider />
+
+      {/* Background — gradient/pattern backdrop, amount and focal position. */}
+      <div class="relative shrink-0">
+        <button
+          type="button"
+          aria-label="Background style"
+          aria-expanded={open.value === 'bg'}
+          onClick$={() => (open.value = open.value === 'bg' ? '' : 'bg')}
+          class={cn(
+            'h-6 w-6 rounded-md ring-1 ring-inset ring-black/15 transition-transform hover:scale-110',
+            open.value === 'bg' && 'ring-2 ring-ring',
+          )}
+          style={{ background: fxPreview }}
+        />
+        {open.value === 'bg' && (
+          <Popover label="Background">
+            <div class="w-56 space-y-3">
+              <div class="grid grid-cols-4 gap-1.5">
+                {BACKDROPS.map((b) => (
+                  <button
+                    key={b.id}
+                    type="button"
+                    aria-pressed={fxStyle === b.id}
+                    onClick$={() => setExtra$(b.id, 'fx-')}
+                    class={cn(
+                      'flex flex-col items-center gap-1 rounded-md p-1 text-[0.6rem] transition-colors hover:bg-accent',
+                      fxStyle === b.id ? 'bg-accent text-foreground' : 'text-muted-foreground',
+                    )}
+                  >
+                    <span
+                      class="h-8 w-full rounded ring-1 ring-inset ring-black/15"
+                      style={{ background: b.preview }}
+                    />
+                    <span>{b.label}</span>
+                  </button>
+                ))}
+              </div>
+              <div>
+                <span class="mb-1 block font-mono text-[0.55rem] tracking-widest text-muted-foreground">
+                  AMOUNT
+                </span>
+                <div class="flex gap-1">
+                  {FX_AMOUNTS.map((a) => (
+                    <button
+                      key={a.id || 'med'}
+                      type="button"
+                      aria-pressed={fxAmt === a.id}
+                      onClick$={() => setExtra$(a.id, 'fxa-')}
+                      class={cn(
+                        'flex-1 rounded-md border px-1 py-1 text-[0.65rem] transition-colors',
+                        fxAmt === a.id
+                          ? 'border-ring bg-accent text-foreground'
+                          : 'text-muted-foreground hover:bg-accent/60',
+                      )}
+                    >
+                      {a.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <span class="mb-1 block font-mono text-[0.55rem] tracking-widest text-muted-foreground">
+                  FOCUS
+                </span>
+                <div class="flex gap-1">
+                  {FX_POS.map((p) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      aria-pressed={fxPos === p.id}
+                      onClick$={() => setExtra$(p.id, 'fxp-')}
+                      class={cn(
+                        'flex h-7 flex-1 items-center justify-center rounded-md border text-xs transition-colors',
+                        fxPos === p.id
+                          ? 'border-ring bg-accent text-foreground'
+                          : 'text-muted-foreground hover:bg-accent/60',
+                      )}
+                    >
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           </Popover>
         )}

@@ -157,7 +157,7 @@ export const Band = component$<{
         {lead}
       </p>
     )}
-    <div class="mt-8">
+    <div class="reveal mt-8">
       <Slot />
     </div>
   </section>

@@ -6,7 +6,7 @@ import { useLocation } from '@builder.io/qwik-city';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { version as styledKitVersion } from '../../../../../packages/kit-styled/package.json';
-import { LogoIcon, LogoWithBorders } from '../icons/logo';
+import { LogoWithBorders } from '../icons/logo';
 
 import { useTheme } from '@qwik-ui/themes';
 
@@ -129,9 +129,8 @@ export default component$(({ showVersion = false }: HeaderProps) => {
     >
       <header class="flex w-full items-center gap-2">
         <section class="flex shrink-0 items-center justify-start">
-          <a href="/" aria-label="Qwik UI Logo" class="ml-4">
-            <LogoWithBorders class="hidden sm:block" />
-            <LogoIcon class="block sm:hidden" />
+          <a href="/" aria-label="Qwik UI Logo" class="ml-4 shrink-0">
+            <LogoWithBorders />
           </a>
           {showVersion && (
             <div class="ml-4 hidden text-xs md:flex">

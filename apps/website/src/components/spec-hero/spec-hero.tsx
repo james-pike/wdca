@@ -67,17 +67,17 @@ const HERO_CSS = `
     mask-image: radial-gradient(125% 105% at 20% 32%, #000 0%, #000 42%, transparent 100%);
   }
 
-  /* primary glow, upper-right */
+  /* palette glows — primary upper-right, secondary upper-left, tertiary lower */
   .hero::after {
     content: "";
     position: absolute;
+    inset: 0;
     z-index: -1;
-    width: 62vmax;
-    height: 62vmax;
-    right: -20vmax;
-    top: -24vmax;
-    background: radial-gradient(circle, color-mix(in oklab, var(--primary) 24%, transparent), transparent 62%);
     pointer-events: none;
+    background:
+      radial-gradient(50vmax 50vmax at 90% -10%, color-mix(in oklab, var(--primary) 28%, transparent), transparent 60%),
+      radial-gradient(38vmax 38vmax at 4% 6%, color-mix(in oklab, var(--secondary) 20%, transparent), transparent 60%),
+      radial-gradient(44vmax 44vmax at 62% 112%, color-mix(in oklab, var(--tertiary) 18%, transparent), transparent 60%);
   }
 
   .hero-eyebrow {

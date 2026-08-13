@@ -13,6 +13,8 @@ export default component$(() => {
 
   return (
     <>
+      {/* Themed gradient/pattern backdrop behind the whole page. */}
+      <div class="site-backdrop" aria-hidden="true" />
       <Header />
       <main>
         <Slot />

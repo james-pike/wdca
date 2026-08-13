@@ -1522,3 +1522,120 @@
   min-height: calc(100vh - var(--header-h) - var(--tabbar-h));
   min-height: calc(100svh - var(--header-h) - var(--tabbar-h));
 }
+
+/* ------------------------------------------------------------------
+   Scroll-reveal entry animation. Pure CSS scroll-driven; guarded by
+   @supports so unsupported browsers show content normally, and by
+   reduced-motion. Applied to section content (see the Band component).
+------------------------------------------------------------------ */
+@keyframes fx-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: fx-reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 26%;
+    }
+  }
+}
+
+/* ------------------------------------------------------------------
+   Themed background system. A fixed `.site-backdrop` layer (rendered once
+   in layout-landing) paints palette-coloured gradients / patterns behind
+   the page. The active look is chosen by an `fx-*` class on the root
+   (theme string); amount by `fxa-*`, focal position by `fxp-*`. Default
+   (no class) is a soft multi-colour mesh. All colours come from the theme
+   tokens, so backdrops restyle with the pickers and colour-harmony modes.
+------------------------------------------------------------------ */
+:root {
+  --fx-x: 84%;
+  --fx-y: 4%;
+  --fx-a: 0.6;
+}
+.fxa-1 {
+  --fx-a: 0.32;
+}
+.fxa-2 {
+  --fx-a: 0.95;
+}
+.fxp-tl { --fx-x: 12%; --fx-y: 10%; }
+.fxp-tr { --fx-x: 88%; --fx-y: 10%; }
+.fxp-bl { --fx-x: 12%; --fx-y: 90%; }
+.fxp-br { --fx-x: 88%; --fx-y: 90%; }
+.fxp-c  { --fx-x: 50%; --fx-y: 42%; }
+
+.site-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: var(--fx-a);
+  transition: opacity 0.4s ease;
+  /* default look = mesh */
+  background:
+    radial-gradient(45vmax 45vmax at var(--fx-x) var(--fx-y), color-mix(in oklab, var(--primary) 40%, transparent), transparent 60%),
+    radial-gradient(42vmax 42vmax at 12% 24%, color-mix(in oklab, var(--secondary) 34%, transparent), transparent 60%),
+    radial-gradient(40vmax 40vmax at 20% 92%, color-mix(in oklab, var(--tertiary) 30%, transparent), transparent 60%),
+    radial-gradient(44vmax 44vmax at 92% 88%, color-mix(in oklab, var(--quad) 30%, transparent), transparent 62%);
+}
+.fx-none .site-backdrop { background: none; }
+.fx-glow .site-backdrop {
+  background: radial-gradient(60vmax 60vmax at var(--fx-x) var(--fx-y), color-mix(in oklab, var(--primary) 36%, transparent), transparent 62%);
+}
+.fx-mesh .site-backdrop {
+  background:
+    radial-gradient(45vmax 45vmax at var(--fx-x) var(--fx-y), color-mix(in oklab, var(--primary) 40%, transparent), transparent 60%),
+    radial-gradient(42vmax 42vmax at 12% 24%, color-mix(in oklab, var(--secondary) 34%, transparent), transparent 60%),
+    radial-gradient(40vmax 40vmax at 20% 92%, color-mix(in oklab, var(--tertiary) 30%, transparent), transparent 60%),
+    radial-gradient(44vmax 44vmax at 92% 88%, color-mix(in oklab, var(--quad) 30%, transparent), transparent 62%);
+}
+.fx-aurora .site-backdrop {
+  background:
+    linear-gradient(115deg, color-mix(in oklab, var(--primary) 34%, transparent), transparent 42%),
+    linear-gradient(300deg, color-mix(in oklab, var(--secondary) 30%, transparent), transparent 46%),
+    conic-gradient(from 210deg at var(--fx-x) var(--fx-y), color-mix(in oklab, var(--tertiary) 28%, transparent), transparent 42%);
+  filter: blur(6px);
+  animation: fx-drift 26s ease-in-out infinite alternate;
+}
+@keyframes fx-drift {
+  to { transform: translate3d(2.5%, 2%, 0) scale(1.06); }
+}
+.fx-dots .site-backdrop {
+  background-image:
+    radial-gradient(circle, color-mix(in oklab, var(--foreground) 26%, transparent) 1px, transparent 1.5px),
+    radial-gradient(52vmax 52vmax at var(--fx-x) var(--fx-y), color-mix(in oklab, var(--primary) 30%, transparent), transparent 60%),
+    radial-gradient(42vmax 42vmax at 14% 86%, color-mix(in oklab, var(--secondary) 26%, transparent), transparent 60%);
+  background-size: 24px 24px, 100% 100%, 100% 100%;
+}
+.fx-grid .site-backdrop {
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--foreground) 7%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--foreground) 7%, transparent) 1px, transparent 1px),
+    radial-gradient(52vmax 52vmax at var(--fx-x) var(--fx-y), color-mix(in oklab, var(--primary) 28%, transparent), transparent 60%),
+    radial-gradient(44vmax 44vmax at 10% 92%, color-mix(in oklab, var(--tertiary) 24%, transparent), transparent 60%);
+  background-size: 40px 40px, 40px 40px, 100% 100%, 100% 100%;
+}
+.fx-rays .site-backdrop {
+  background:
+    conic-gradient(from 0deg at var(--fx-x) var(--fx-y),
+      color-mix(in oklab, var(--primary) 30%, transparent),
+      transparent 30deg,
+      color-mix(in oklab, var(--secondary) 26%, transparent) 90deg,
+      transparent 150deg,
+      color-mix(in oklab, var(--tertiary) 26%, transparent) 220deg,
+      transparent 300deg,
+      color-mix(in oklab, var(--primary) 30%, transparent) 360deg);
+  filter: blur(5px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .fx-aurora .site-backdrop { animation: none; }
+}
