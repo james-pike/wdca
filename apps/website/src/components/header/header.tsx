@@ -6,7 +6,6 @@ import { useLocation } from '@builder.io/qwik-city';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { version as styledKitVersion } from '../../../../../packages/kit-styled/package.json';
-import { GitHubIcon } from '../icons/GitHubIcon';
 import { LogoIcon, LogoWithBorders } from '../icons/logo';
 
 import { useTheme } from '@qwik-ui/themes';
@@ -159,21 +158,13 @@ export default component$(({ showVersion = false }: HeaderProps) => {
           </div>
         )}
 
-        <div class="mr-4 ml-auto flex shrink-0 items-center gap-1">
+        <div class="xs:gap-1 mr-2 ml-auto flex min-w-0 items-center gap-0.5 sm:mr-4">
           {/* Landing category nav, grouped with the menu on the right. */}
           {isLanding && <HeaderTabs />}
           {/* Style picker lives in the design Color topic on mobile/tablet. */}
-          <div class="hidden lg:block">
+          <div class="hidden shrink-0 lg:block">
             <MakeItYours />
           </div>
-          <a
-            target="_blank"
-            href="https://github.com/qwikifiers/qwik-ui"
-            aria-label="Qwik-UI GitHub repository"
-            class={cn(buttonVariants({ size: 'icon', look: 'ghost' }))}
-          >
-            <GitHubIcon />
-          </a>
           <Button
             type="button"
             aria-label="Toggle navigation"
@@ -182,7 +173,7 @@ export default component$(({ showVersion = false }: HeaderProps) => {
             }}
             size="icon"
             look="ghost"
-            class="flex lg:hidden"
+            class="flex shrink-0 lg:hidden"
           >
             <LuMenu class="h-6 w-6" />
           </Button>

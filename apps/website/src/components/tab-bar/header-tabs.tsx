@@ -28,7 +28,11 @@ export const HeaderTabs = component$(() => {
   const activeTab = useContext(ActiveTabContext);
 
   return (
-    <nav role="tablist" aria-label="Sections" class="flex items-center gap-0.5">
+    <nav
+      role="tablist"
+      aria-label="Sections"
+      class="flex min-w-0 items-center gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+    >
       {LANDING_TABS.map((tab) => {
         const on = activeTab.value === tab.id;
         const Icon = ICONS[tab.id] ?? LuSparkles;
@@ -42,13 +46,13 @@ export const HeaderTabs = component$(() => {
             title={tab.label}
             onClick$={() => (activeTab.value = tab.id)}
             class={cn(
-              'flex h-9 w-9 shrink-0 items-center justify-center rounded-md transition-colors',
+              'flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition-colors sm:h-9 sm:w-9',
               on
                 ? 'bg-accent text-primary'
                 : 'text-muted-foreground hover:bg-accent/60 hover:text-foreground',
             )}
           >
-            <Icon class="h-5 w-5" />
+            <Icon class="h-[1.15rem] w-[1.15rem] sm:h-5 sm:w-5" />
           </button>
         );
       })}
