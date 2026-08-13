@@ -22,6 +22,13 @@
     --primary-foreground: black;
     --secondary: oklch(69.9% 46.25% 301.823);
     --secondary-foreground: black;
+    /* Extra palette slots. Default to primary so a one-colour theme stays
+       monochrome; the colour-harmony modes override these with wheel-derived
+       hues, and multi-accent components light up automatically. */
+    --tertiary: var(--primary);
+    --tertiary-foreground: var(--primary-foreground);
+    --quad: var(--secondary);
+    --quad-foreground: var(--secondary-foreground);
     --accent: var(--color-slate-100);
     --accent-foreground: var(--color-slate-900);
     --alert: var(--color-red-500);
@@ -62,6 +69,10 @@
     --primary-foreground: black;
     --secondary: oklch(69.9% 46.25% 301.823);
     --secondary-foreground: black;
+    --tertiary: var(--primary);
+    --tertiary-foreground: var(--primary-foreground);
+    --quad: var(--secondary);
+    --quad-foreground: var(--secondary-foreground);
     --accent: var(--color-slate-700);
     --accent-foreground: var(--color-slate-50);
     --alert: var(--color-red-500);
@@ -93,6 +104,10 @@
     --color-primary-foreground: var(--primary-foreground);
     --color-secondary: var(--secondary);
     --color-secondary-foreground: var(--secondary-foreground);
+    --color-tertiary: var(--tertiary);
+    --color-tertiary-foreground: var(--tertiary-foreground);
+    --color-quad: var(--quad);
+    --color-quad-foreground: var(--quad-foreground);
     --color-muted: var(--muted);
     --color-muted-foreground: var(--muted-foreground);
     --color-accent: var(--accent);
@@ -1345,6 +1360,53 @@
     --primary-foreground: white;
   }
   /* CSS PARSER: END - DO NOT REMOVE */
+
+  /* Colour-harmony modes — derive the secondary / tertiary / quad accents from
+     the primary by rotating its hue (and shifting lightness) on the colour
+     wheel via CSS relative-colour syntax. Unsupported browsers ignore these and
+     keep the primary-based defaults. Doubled class names out-specify the
+     .dark.base-* rules that also set --secondary. Foregrounds are set in the
+     grouped rule below (auto black/white for contrast). */
+  .harmony-complementary.harmony-complementary {
+    --secondary: oklch(from var(--primary) l c calc(h + 180));
+    --tertiary: oklch(from var(--primary) calc(l * 0.82) c h);
+    --quad: oklch(from var(--primary) calc(l * 0.82) c calc(h + 180));
+  }
+  .harmony-analogous.harmony-analogous {
+    --secondary: oklch(from var(--primary) l c calc(h + 30));
+    --tertiary: oklch(from var(--primary) l c calc(h - 30));
+    --quad: oklch(from var(--primary) l c calc(h + 60));
+  }
+  .harmony-triadic.harmony-triadic {
+    --secondary: oklch(from var(--primary) l c calc(h + 120));
+    --tertiary: oklch(from var(--primary) l c calc(h + 240));
+    --quad: oklch(from var(--primary) calc(l * 0.82) c calc(h + 120));
+  }
+  .harmony-split.harmony-split {
+    --secondary: oklch(from var(--primary) l c calc(h + 150));
+    --tertiary: oklch(from var(--primary) l c calc(h + 210));
+    --quad: oklch(from var(--primary) calc(l * 0.82) c h);
+  }
+  .harmony-tetradic.harmony-tetradic {
+    --secondary: oklch(from var(--primary) l c calc(h + 90));
+    --tertiary: oklch(from var(--primary) l c calc(h + 180));
+    --quad: oklch(from var(--primary) l c calc(h + 270));
+  }
+  .harmony-monochrome.harmony-monochrome {
+    --secondary: oklch(from var(--primary) calc(l * 0.72) c h);
+    --tertiary: oklch(from var(--primary) calc(l + 0.16) c h);
+    --quad: oklch(from var(--primary) calc(l * 0.5) c h);
+  }
+  .harmony-complementary.harmony-complementary,
+  .harmony-analogous.harmony-analogous,
+  .harmony-triadic.harmony-triadic,
+  .harmony-split.harmony-split,
+  .harmony-tetradic.harmony-tetradic,
+  .harmony-monochrome.harmony-monochrome {
+    --secondary-foreground: oklch(from var(--secondary) clamp(0, (0.62 - l) * 1000, 1) 0 0);
+    --tertiary-foreground: oklch(from var(--tertiary) clamp(0, (0.62 - l) * 1000, 1) 0 0);
+    --quad-foreground: oklch(from var(--quad) clamp(0, (0.62 - l) * 1000, 1) 0 0);
+  }
 }
 
 /* DOCS */

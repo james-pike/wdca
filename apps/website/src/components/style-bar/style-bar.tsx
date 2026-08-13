@@ -16,7 +16,7 @@ import {
   ThemeStyles,
   cn,
 } from '@qwik-ui/utils';
-import { LuMoon, LuSun } from '@qwikest/icons/lucide';
+import { LuCheck, LuMoon, LuSun } from '@qwikest/icons/lucide';
 import { useTheme } from '@qwik-ui/themes';
 import { useAppState } from '~/_state/use-app-state';
 
@@ -50,6 +50,27 @@ const PRIMARY_FULL: string[] = [
 const BASE_COLORS = Object.values(ThemeBaseColors);
 
 /**
+ * Colour-harmony modes. Each derives the secondary/complementary colour from the
+ * primary by rotating its hue on the wheel (see the `.harmony-*` classes in
+ * global.css). `expr` mirrors that CSS so the popover can preview the result.
+ */
+const HARMONIES: { id: string; label: string; expr: string }[] = [
+  { id: '', label: 'Default', expr: 'var(--secondary)' },
+  { id: 'harmony-complementary', label: 'Complementary', expr: 'oklch(from var(--primary) l c calc(h + 180))' },
+  { id: 'harmony-analogous', label: 'Analogous', expr: 'oklch(from var(--primary) l c calc(h + 40))' },
+  { id: 'harmony-triadic', label: 'Triadic', expr: 'oklch(from var(--primary) l c calc(h + 120))' },
+  { id: 'harmony-split', label: 'Split-complementary', expr: 'oklch(from var(--primary) l c calc(h + 150))' },
+  { id: 'harmony-tetradic', label: 'Tetradic', expr: 'oklch(from var(--primary) l c calc(h + 90))' },
+  { id: 'harmony-monochrome', label: 'Monochrome', expr: 'oklch(from var(--primary) calc(l * 0.72) c h)' },
+];
+
+/** Extract the active `harmony-*` token from a theme string (or '' for none). */
+const harmonyOf = (value: string | string[] | undefined): string => {
+  const arr = Array.isArray(value) ? value : (value ?? '').split(' ');
+  return arr.find((c) => c.startsWith('harmony-')) ?? '';
+};
+
+/**
  * Mobile-only sticky "style bar" for the design tab. It sits directly beneath
  * the hero fold; once scrolled up it sticks to the bottom of the tab bar (top =
  * header + tab-bar heights) and keeps the full theme-string controls in reach
@@ -64,7 +85,7 @@ export const StyleBar = component$(() => {
   const rootStore = useAppState();
   const { themeSig } = useTheme();
   // Which colour popover is open ('' = none). One at a time.
-  const open = useSignal<'base' | 'primary' | ''>('');
+  const open = useSignal<'base' | 'primary' | 'harmony' | ''>('');
 
   const cfgSig = useComputed$((): ThemeConfig => {
     const value = themeSig.value;
@@ -86,7 +107,7 @@ export const StyleBar = component$(() => {
     return { font, mode, style, baseColor, primaryColor, borderRadius };
   });
 
-  // Rebuild the theme string from a partial patch over the current config.
+  // Rebuild the theme string from a patch, preserving the current harmony class.
   const apply$ = $((patch: Partial<ThemeConfig>) => {
     const c = { ...cfgSig.value, ...patch };
     themeSig.value = [
@@ -96,11 +117,31 @@ export const StyleBar = component$(() => {
       c.baseColor,
       c.primaryColor,
       c.borderRadius,
-    ].join(' ');
+      harmonyOf(themeSig.value),
+    ]
+      .filter(Boolean)
+      .join(' ');
+  });
+
+  // Set (or clear) the colour-harmony class, keeping the rest of the config.
+  const applyHarmony$ = $((mode: string) => {
+    const c = cfgSig.value;
+    themeSig.value = [
+      c.font,
+      c.mode,
+      c.style,
+      c.baseColor,
+      c.primaryColor,
+      c.borderRadius,
+      mode,
+    ]
+      .filter(Boolean)
+      .join(' ');
   });
 
   const cfg = cfgSig.value;
   const isDark = cfg.mode?.includes('dark');
+  const harmony = harmonyOf(themeSig.value);
 
   return (
     <div
@@ -108,8 +149,6 @@ export const StyleBar = component$(() => {
         'sticky z-[8] flex h-[var(--stylebar-h)] w-full items-center gap-2 px-3',
         'top-[calc(var(--header-h)+var(--tabbar-h))]',
         'border-b bg-background/90 backdrop-blur-md',
-        // Mobile only — desktop keeps the "Make it yours" modal.
-        'lg:hidden',
       )}
       role="group"
       aria-label="Theme style controls"
@@ -197,6 +236,46 @@ export const StyleBar = component$(() => {
                     open.value = '';
                   }}
                 />
+              ))}
+            </div>
+          </Popover>
+        )}
+      </div>
+
+      {/* Complementary — a swatch of the derived secondary; opens the wheel modes. */}
+      <div class="relative shrink-0">
+        <button
+          type="button"
+          aria-label="Complementary colour"
+          aria-expanded={open.value === 'harmony'}
+          onClick$={() => (open.value = open.value === 'harmony' ? '' : 'harmony')}
+          class={cn(
+            'h-6 w-6 rounded-full ring-1 ring-inset ring-black/15 transition-transform hover:scale-110',
+            open.value === 'harmony' && 'ring-2 ring-ring',
+          )}
+          style={{ background: 'var(--secondary)' }}
+        />
+        {open.value === 'harmony' && (
+          <Popover label="Complementary">
+            <div class="flex w-52 flex-col gap-0.5">
+              {HARMONIES.map((h) => (
+                <button
+                  key={h.id || 'default'}
+                  type="button"
+                  aria-pressed={harmony === h.id}
+                  onClick$={() => {
+                    applyHarmony$(h.id);
+                    open.value = '';
+                  }}
+                  class="flex items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs transition-colors hover:bg-accent"
+                >
+                  <span
+                    class="h-4 w-4 shrink-0 rounded-full ring-1 ring-inset ring-black/15"
+                    style={{ background: h.expr }}
+                  />
+                  <span class="flex-1">{h.label}</span>
+                  {harmony === h.id && <LuCheck class="h-3.5 w-3.5 shrink-0 text-primary" />}
+                </button>
               ))}
             </div>
           </Popover>

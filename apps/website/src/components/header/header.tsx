@@ -1,11 +1,4 @@
-import {
-  $,
-  PropsOf,
-  component$,
-  useComputed$,
-  useSignal,
-  useStyles$,
-} from '@builder.io/qwik';
+import { component$, useComputed$, useSignal, useStyles$ } from '@builder.io/qwik';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { version as headlessVersion } from '../../../../../packages/kit-headless/package.json';
 // eslint-disable-next-line @nx/enforce-module-boundaries
@@ -20,14 +13,13 @@ import { useTheme } from '@qwik-ui/themes';
 
 import { Modal } from '@qwik-ui/headless';
 import { useAppState } from '~/_state/use-app-state';
-import { LuMenu, LuMoon, LuSun, LuX } from '@qwikest/icons/lucide';
+import { LuMenu, LuX } from '@qwikest/icons/lucide';
 import { DocsNavigation } from '../navigation-docs/navigation-docs';
 import { useKitMenuItems } from '~/routes/layout';
 import { cn } from '@qwik-ui/utils';
-import { DiscordIcon } from '../icons/discord';
 import { Button, buttonVariants } from '@qwik-ui/styled';
 import MakeItYours from '../make-it-yours/make-it-yours';
-import { SearchModal } from '../search/search';
+import { HeaderTabs } from '../tab-bar/header-tabs';
 export interface HeaderProps {
   showVersion?: boolean;
   showBottomBorder?: boolean;
@@ -101,6 +93,9 @@ export default component$(({ showVersion = false }: HeaderProps) => {
   const rootStore = useAppState();
   const isSidebarOpenedSig = useSignal(false);
   const location = useLocation();
+  // On the landing route the category nav lives inline in the header; elsewhere
+  // the header shows the kit doc links instead.
+  const isLanding = location.url.pathname === '/';
 
   const isDocsActive = (baseHref: string) => {
     const isLinkActive = location.url.pathname.startsWith(baseHref);
@@ -133,8 +128,8 @@ export default component$(({ showVersion = false }: HeaderProps) => {
       )}
       bind:show={isSidebarOpenedSig}
     >
-      <header class="flex w-full items-center justify-between">
-        <section class="flex items-center justify-start">
+      <header class="flex w-full items-center gap-2">
+        <section class="flex shrink-0 items-center justify-start">
           <a href="/" aria-label="Qwik UI Logo" class="ml-4">
             <LogoWithBorders class="hidden sm:block" />
             <LogoIcon class="block sm:hidden" />
@@ -147,8 +142,9 @@ export default component$(({ showVersion = false }: HeaderProps) => {
           )}
         </section>
 
-        <div class="mr-4 flex items-center">
-          <div class="mr-6 hidden items-center space-x-8 text-sm lg:flex">
+        {/* Docs: kit doc links in the middle (landing uses header category nav). */}
+        {!isLanding && (
+          <div class="ml-6 hidden items-center space-x-8 text-sm lg:flex">
             <a
               class={isDocsActive('/docs/headless/')}
               href="/docs/headless/introduction/"
@@ -161,38 +157,35 @@ export default component$(({ showVersion = false }: HeaderProps) => {
               </a>
             )}
           </div>
-          <div class="xs:space-x-4 flex items-center space-x-1">
+        )}
+
+        <div class="mr-4 ml-auto flex shrink-0 items-center gap-1">
+          {/* Landing category nav, grouped with the menu on the right. */}
+          {isLanding && <HeaderTabs />}
+          {/* Style picker lives in the design Color topic on mobile/tablet. */}
+          <div class="hidden lg:block">
             <MakeItYours />
-            <SearchModal />
-            <a
-              href="https://discord.gg/PVWUUejrez"
-              target="_blank"
-              class={cn(buttonVariants({ size: 'icon', look: 'ghost' }))}
-            >
-              <DiscordIcon />
-            </a>
-            <a
-              target="_blank"
-              href="https://github.com/qwikifiers/qwik-ui"
-              aria-label="Qwik-UI GitHub repository"
-              class={cn(buttonVariants({ size: 'icon', look: 'ghost' }))}
-            >
-              <GitHubIcon />
-            </a>
-            <DarkModeToggle />
-            <Button
-              type="button"
-              aria-label="Toggle navigation"
-              onClick$={() => {
-                isSidebarOpenedSig.value = !isSidebarOpenedSig.value;
-              }}
-              size="icon"
-              look="ghost"
-              class="flex lg:hidden"
-            >
-              <LuMenu class="h-6 w-6" />
-            </Button>
           </div>
+          <a
+            target="_blank"
+            href="https://github.com/qwikifiers/qwik-ui"
+            aria-label="Qwik-UI GitHub repository"
+            class={cn(buttonVariants({ size: 'icon', look: 'ghost' }))}
+          >
+            <GitHubIcon />
+          </a>
+          <Button
+            type="button"
+            aria-label="Toggle navigation"
+            onClick$={() => {
+              isSidebarOpenedSig.value = !isSidebarOpenedSig.value;
+            }}
+            size="icon"
+            look="ghost"
+            class="flex lg:hidden"
+          >
+            <LuMenu class="h-6 w-6" />
+          </Button>
         </div>
       </header>
       <Modal.Panel class="sidebar-mobile rounded-base mr-0 ml-auto h-screen w-sm border-0 bg-background text-foreground shadow-md">
@@ -213,38 +206,5 @@ export default component$(({ showVersion = false }: HeaderProps) => {
         </button>
       </Modal.Panel>
     </Modal.Root>
-  );
-});
-
-const DarkModeToggle = component$<PropsOf<typeof Button>>(({ ...props }) => {
-  const { themeSig } = useTheme();
-  const switchLightDark = $((input: string | string[]): string | string[] | undefined => {
-    const switchWord = (word: string): string =>
-      word.includes('light')
-        ? word.replace('light', 'dark')
-        : word.replace('dark', 'light');
-    if (typeof input === 'string') {
-      return switchWord(input);
-    } else if (Array.isArray(input)) {
-      return input.map((item) => switchWord(item));
-    }
-  });
-  return (
-    <Button
-      {...props}
-      aria-label="Toggle dark mode"
-      size="icon"
-      look="ghost"
-      onClick$={async () =>
-        (themeSig.value = await switchLightDark(themeSig.value || 'light'))
-      }
-    >
-      <div class="hidden dark:block">
-        <LuMoon class="h-6 w-6" />
-      </div>
-      <div class="block dark:hidden">
-        <LuSun class="h-6 w-6" />
-      </div>
-    </Button>
   );
 });

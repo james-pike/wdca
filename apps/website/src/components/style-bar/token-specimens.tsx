@@ -6,10 +6,10 @@ import { LuArrowRight, LuCheck, LuStar } from '@qwikest/icons/lucide';
  * on the design tab. Everything here reads from the live theme tokens (primary,
  * border, radius, shadow, base), so scrolling this section while the sticky bar
  * stays in reach shows each pick restyle the components in real time — the
- * hero's "everything is a token" claim, made tactile. Mobile only.
+ * hero's "everything is a token" claim, made tactile.
  */
 export const TokenSpecimens = component$(() => (
-  <section class="mx-auto w-full max-w-2xl px-6 py-10 lg:hidden">
+  <section class="mx-auto w-full max-w-2xl px-6 py-10">
     <p class="mb-6 font-mono text-xs tracking-widest text-muted-foreground">
       LIVE SPECIMENS · tweak the bar above
     </p>
@@ -69,6 +69,48 @@ export const TokenSpecimens = component$(() => (
         />
       </div>
 
+      {/* Palette — primary + the harmony-derived accents. In a one-colour theme
+          these read as one colour; pick a harmony mode and they diverge. */}
+      <div>
+        <span class="mb-2 block font-mono text-[0.66rem] tracking-[0.2em] text-muted-foreground">
+          PALETTE
+        </span>
+        <div class="flex flex-wrap gap-2">
+          <span
+            class="rounded-full px-3 py-1 text-xs font-medium"
+            style={{ background: 'var(--primary)', color: 'var(--primary-foreground)' }}
+          >
+            primary
+          </span>
+          <span
+            class="rounded-full px-3 py-1 text-xs font-medium"
+            style={{ background: 'var(--secondary)', color: 'var(--secondary-foreground)' }}
+          >
+            secondary
+          </span>
+          <span
+            class="rounded-full px-3 py-1 text-xs font-medium"
+            style={{ background: 'var(--tertiary)', color: 'var(--tertiary-foreground)' }}
+          >
+            tertiary
+          </span>
+          <span
+            class="rounded-full px-3 py-1 text-xs font-medium"
+            style={{ background: 'var(--quad)', color: 'var(--quad-foreground)' }}
+          >
+            quad
+          </span>
+        </div>
+        {/* A blended bar so multi-colour schemes are obvious at a glance. */}
+        <div
+          class="mt-3 h-6 w-full rounded-[var(--border-radius)]"
+          style={{
+            background:
+              'linear-gradient(90deg, var(--primary), var(--secondary), var(--tertiary), var(--quad))',
+          }}
+        />
+      </div>
+
       {/* Badges */}
       <div>
         <span class="mb-2 block font-mono text-[0.66rem] tracking-[0.2em] text-muted-foreground">
@@ -78,14 +120,17 @@ export const TokenSpecimens = component$(() => (
           <span class="rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground">
             primary
           </span>
+          <span
+            class="rounded-full px-3 py-1 text-xs font-medium"
+            style={{ background: 'var(--secondary)', color: 'var(--secondary-foreground)' }}
+          >
+            secondary
+          </span>
           <span class="rounded-full border px-3 py-1 text-xs font-medium text-foreground">
             outline
           </span>
           <span class="rounded-full bg-accent px-3 py-1 text-xs font-medium text-accent-foreground">
             accent
-          </span>
-          <span class="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
-            muted
           </span>
         </div>
       </div>
