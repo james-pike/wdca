@@ -71,6 +71,22 @@ const harmonyOf = (value: string | string[] | undefined): string => {
 };
 
 /**
+ * How many derived accents each scheme adds beyond the primary — 1 (secondary),
+ * 2 (+tertiary) or 3 (+quad). The bar shows exactly this many accent swatches,
+ * shrinking them as the count grows so they stay within the same footprint.
+ */
+const ACCENT_COUNT: Record<string, number> = {
+  '': 1,
+  'harmony-complementary': 1,
+  'harmony-analogous': 2,
+  'harmony-triadic': 2,
+  'harmony-split': 2,
+  'harmony-tetradic': 3,
+  'harmony-monochrome': 3,
+};
+const ACCENT_VARS = ['var(--secondary)', 'var(--tertiary)', 'var(--quad)'];
+
+/**
  * Mobile-only sticky "style bar" for the design tab. It sits directly beneath
  * the hero fold; once scrolled up it sticks to the bottom of the tab bar (top =
  * header + tab-bar heights) and keeps the full theme-string controls in reach
@@ -142,6 +158,10 @@ export const StyleBar = component$(() => {
   const cfg = cfgSig.value;
   const isDark = cfg.mode?.includes('dark');
   const harmony = harmonyOf(themeSig.value);
+  const accentCount = ACCENT_COUNT[harmony] ?? 1;
+  const accentVars = ACCENT_VARS.slice(0, accentCount);
+  // Shrink each accent swatch as more appear so the cluster keeps its footprint.
+  const accentPx = accentCount === 1 ? 24 : accentCount === 2 ? 18 : 14;
 
   return (
     <div
@@ -242,19 +262,27 @@ export const StyleBar = component$(() => {
         )}
       </div>
 
-      {/* Complementary — a swatch of the derived secondary; opens the wheel modes. */}
+      {/* Complementary — swatches of the derived accents (secondary, then
+          tertiary/quad when the scheme has them); opens the wheel modes. */}
       <div class="relative shrink-0">
         <button
           type="button"
-          aria-label="Complementary colour"
+          aria-label="Complementary colour scheme"
           aria-expanded={open.value === 'harmony'}
           onClick$={() => (open.value = open.value === 'harmony' ? '' : 'harmony')}
           class={cn(
-            'h-6 w-6 rounded-full ring-1 ring-inset ring-black/15 transition-transform hover:scale-110',
+            'flex items-center gap-0.5 rounded-full p-0.5 transition-transform hover:scale-105',
             open.value === 'harmony' && 'ring-2 ring-ring',
           )}
-          style={{ background: 'var(--secondary)' }}
-        />
+        >
+          {accentVars.map((v, i) => (
+            <span
+              key={i}
+              class="rounded-full ring-1 ring-inset ring-black/15"
+              style={{ width: `${accentPx}px`, height: `${accentPx}px`, background: v }}
+            />
+          ))}
+        </button>
         {open.value === 'harmony' && (
           <Popover label="Complementary">
             <div class="flex w-52 flex-col gap-0.5">
