@@ -44,6 +44,7 @@
        the fold-fill calc stay in sync with the actual header/tab-bar heights. */
     --header-h: 4rem; /* 64px, matches the header's h-16 */
     --tabbar-h: 2.75rem; /* 44px, matches the tab bar's h-11 */
+    --stylebar-h: 2.5rem; /* 40px — the mobile sticky style bar (third chrome tier under 64/44) */
   }
 
   .dark {
